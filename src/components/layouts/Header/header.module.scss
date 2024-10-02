@@ -1,0 +1,63 @@
+@import "@styles/base/variables";
+
+.header {
+    position: fixed;
+    left: 0;
+    top: 10px;
+    z-index: 10;
+    width: 100%;
+    &__inner {
+        padding: 25px 30px;
+        border-radius: 40px;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .25);
+        background: $blue;
+        display: grid;
+        align-items: center;
+        grid-template-columns: repeat(12, 1fr);
+    }
+    &__left {
+        grid-column: span 3 / auto;
+        display: flex;
+    }
+    &__logo {
+        margin-top: 2px;
+        max-width: 180px;
+    }
+    &__center {
+        grid-column: span 6 / auto;
+    }
+    .nav {
+        &__list {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+        &__item {
+
+        }
+        &__link {
+            color: $white;
+            line-height: 140%;
+            &:hover {
+                color: $light-blue;
+            }
+            &_active {
+                color: yellow;
+                border-bottom: 1px solid yellow;
+                text-underline-offset: 4px;
+                &:hover {
+                    color: yellow;
+                }
+            }
+        }
+    }
+    .feedback {
+        grid-column: span 3 / auto;
+        margin-left: auto;
+    }
+    .burger {
+        display: none;
+    }
+}
+

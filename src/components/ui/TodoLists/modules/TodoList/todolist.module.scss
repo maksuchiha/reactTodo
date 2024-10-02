@@ -1,0 +1,76 @@
+@import "@styles/base/variables";
+
+.todolist {
+    background: $white;
+    padding: 20px;
+    border-radius: 15px;
+    grid-column: span 2 / auto;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    &__title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        margin-bottom: 20px;
+        input {
+            font-weight: 800;
+        }
+        button {
+            padding: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    }
+    .addNewTask {
+        margin-bottom: 23px;
+    }
+    .tasks {
+        margin-bottom: 20px;
+        display: grid;
+        gap: 10px;
+        li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            label {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                cursor: pointer;
+            }
+            span {
+                font-weight: 400;
+            }
+            button {
+                width: 20px;
+                height: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 1px solid $black;
+                font-size: 12px;
+                margin-left: auto;
+            }
+        }
+    }
+    .filter {
+        margin-top: auto;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        &__item {
+            padding: 8px 10px;
+            border: 1px solid $black;
+            &_active {
+                background: $blue;
+                color: $white;
+            }
+        }
+    }
+    .remove {
+
+    }
+}

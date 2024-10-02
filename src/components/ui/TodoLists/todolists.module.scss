@@ -1,0 +1,12 @@
+.todoLists {
+    display: grid;
+    gap: 25px;
+    &__top {
+        max-width: 300px;
+    }
+    &__items {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 25px;
+    }
+}
