@@ -1,14 +1,10 @@
-import {FC} from 'react';
-import {TodoLists} from "@components/ui/TodoLists";
+import { FC } from 'react';
+import { TodoLists } from '@features/TodoLists';
 
-type HomePagePropsType = {
-
-}
-
-export const HomePage:FC<HomePagePropsType> = () => {
-    return (
-        <>
-            <TodoLists/>
-        </>
-    );
-}
+export const HomePage: FC = () => {
+	return (
+		<>
+			<TodoLists />
+		</>
+	);
+};

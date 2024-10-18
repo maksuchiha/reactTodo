@@ -1,31 +1,31 @@
-@import "@styles/base/variables";
+@import '@styles/base/variables';
 
 .addInput {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 5px 10px;
-    position: relative;
-    input {
-        border: 1px solid $black;
-        padding: 5px 10px;
-        flex: auto;
-    }
-    button {
-        width: 30px;
-        height: 30px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border: 1px solid $black;
-    }
-    .error {
-        position: absolute;
-        bottom: -20px;
-        left: 0;
-        z-index: 1;
-        font-size: 15px;
-        font-weight: 400;
-        color: $red;
-    }
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 5px 10px;
+	position: relative;
+	input {
+		border: 1px solid $black;
+		padding: 5px 10px;
+		flex: auto;
+	}
+	button {
+		width: 30px;
+		height: 30px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		border: 1px solid $black;
+	}
+	.error {
+		position: absolute;
+		bottom: -20px;
+		left: 0;
+		z-index: 1;
+		font-size: 15px;
+		font-weight: 400;
+		color: $red;
+	}
 }
