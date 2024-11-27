@@ -38,7 +38,7 @@ export default defineConfig({
 		globals: true, // чтобы не писать import для describe и it в каждом файле
 		exclude: [...configDefaults.exclude, 'e2e/*'], // исключить e2e тесты, если есть
 	},
-	base: '/reactTodo/',
+	base: '/reactTodo',
 	server: {
 		port: 3000, // Настройка порта
 		open: true, // Автооткрытие браузера при запуске
