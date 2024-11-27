@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { FC } from 'react';
-import { ProductDataType } from '../App';
+import { ProductDataType } from '@store/localState';
 
 type DoingPropsType = {
 	path: string;

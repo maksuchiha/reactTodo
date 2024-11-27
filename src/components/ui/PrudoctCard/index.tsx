@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { ProductDataType } from '../../../App';
+import { ProductDataType } from '@store/localState';
 import { WebpImage } from '@features/WebpImage';
 
 type ProductCardPropsType = {

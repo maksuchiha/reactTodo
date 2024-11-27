@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 import { Paths } from '../paths';
-import { ProductDataType } from '../App';
+import { ProductDataType } from '@store/localState';
 import { ProductCard } from '../components/ui';
 
 type ProductPagePropsType = {
