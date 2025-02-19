@@ -1,10 +1,11 @@
 import { Outlet } from 'react-router-dom';
 import { Header } from '@components/layouts/Header';
 import { Footer } from '@components/layouts/Footer';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { fetchTodoListsTC } from '@store/todo-reducer';
 import { AppDispatch } from '@store/store';
+import { ErrorSnackbar } from './components/ui/ErrorSnackbar';
 
 export const App = () => {
 	const dispatch = useDispatch<AppDispatch>();
@@ -29,6 +30,7 @@ export const App = () => {
 				</div>
 			</main>
 			<Footer />
+			<ErrorSnackbar />
 		</>
 	);
 };

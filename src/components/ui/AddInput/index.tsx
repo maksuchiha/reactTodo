@@ -1,5 +1,5 @@
 import { ChangeEvent, FC, KeyboardEvent, memo, useCallback, useEffect, useState } from 'react';
-import s from './addInput.module.scss';
+import s from './AddInput.module.scss';
 
 type AddInputPropsType = {
 	placeholder: string;

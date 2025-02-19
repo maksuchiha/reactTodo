@@ -1,6 +1,6 @@
 import s from './header.module.scss';
 import Logo from '@/assets/icons/logo.svg';
-import { Button } from '@components/ui';
+import { Button, ProgressBar } from '@components/ui';
 import { NavLink } from 'react-router-dom';
 
 type ActiveClassType = {
@@ -14,6 +14,7 @@ export const Header = () => {
 
 	return (
 		<header className={s.header}>
+			<ProgressBar />
 			<div className={`container`}>
 				<div className={s.header__inner}>
 					<div className={s.header__left}>

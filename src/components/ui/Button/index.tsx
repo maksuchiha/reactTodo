@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import s from './button.module.scss';
+import s from './Button.module.scss';
 import { Icon } from '../Icon';
 
 type ButtonPropsType = {

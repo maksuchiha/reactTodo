@@ -39,5 +39,8 @@ export const router = createBrowserRouter(
 	],
 	{
 		basename: '/reactTodo', // базовый путь
+		future: {
+			v7_startTransition: true,
+		},
 	},
 );

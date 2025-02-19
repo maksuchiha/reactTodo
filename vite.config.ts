@@ -3,7 +3,6 @@ import react from '@vitejs/plugin-react';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import path from 'path';
 import dotenv from 'dotenv';
-import { configDefaults } from 'vitest/config';
 
 dotenv.config();
 
@@ -32,12 +31,6 @@ export default defineConfig({
 		//     },
 		// }),
 	],
-	test: {
-		environment: 'jsdom',
-		setupFiles: './src/setupTests.ts', // путь к файлу для настройки тестов (опционально)
-		globals: true, // чтобы не писать import для describe и it в каждом файле
-		exclude: [...configDefaults.exclude, 'e2e/*'], // исключить e2e тесты, если есть
-	},
 	base: '/reactTodo',
 	server: {
 		port: 3000, // Настройка порта
@@ -46,6 +39,7 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			'@': path.resolve(__dirname, './src'), // добавляем алиас для удобства работы с путями
+			'@assets': path.resolve(__dirname, './src/assets/'),
 			'@styles': path.resolve(__dirname, './src/styles/'),
 			'@features': path.resolve(__dirname, './src/features/'),
 			'@components': path.resolve(__dirname, './src/components/'),

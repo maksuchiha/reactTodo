@@ -1,0 +1,31 @@
+@import '@styles/base/variables';
+
+.wrapper {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    z-index: 10;
+    background: $blue;
+    padding: 20px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    color: $white;
+    &_error {
+        background: $red;
+    }
+    &_alert {
+        background: orange;
+    }
+}
+
+.message {
+
+}
+
+.close {
+    width: 20px;
+    height: 20px;
+
+}
