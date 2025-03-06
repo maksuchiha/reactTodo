@@ -90,6 +90,7 @@ export const TodoLists: FC = () => {
 				changeTaskTitle={changeTaskTitle}
 				changeTodoListTitle={changeTodoListTitle}
 				updateTaskStatus={updateTaskStatus}
+				entityStatus={tl.entityStatus}
 			/>
 		);
 	});

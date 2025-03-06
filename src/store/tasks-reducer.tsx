@@ -100,9 +100,18 @@ export const removeTaskTC =
 	(dispatch) => {
 		if (!todolistId || !taskKId) return;
 		dispatch(setAppStatusAC('loading'));
-		tasksApi.deleteTask(todolistId, taskKId).then(() => {
-			dispatch(removeTaskAC(todolistId, taskKId));
-			dispatch(setAppStatusAC('succeeded'));
+		tasksApi.deleteTask(todolistId, taskKId).then((res) => {
+			if (res.data.resultCode === ResultCode.Success) {
+				dispatch(removeTaskAC(todolistId, taskKId));
+				dispatch(setAppStatusAC('succeeded'));
+			} else {
+				if (res.data.messages.length) {
+					dispatch(setAppErrorAC(res.data.messages[0]));
+				} else {
+					dispatch(setAppErrorAC('Some error occurred'));
+				}
+				dispatch(setAppStatusAC('failed'));
+			}
 		});
 	};
 
@@ -155,9 +164,18 @@ export const updateTaskTC =
 				}
 			}
 
-			tasksApi.updateTask(todolistId, taskId, model).then(() => {
-				dispatch(updateTaskAC(todolistId, taskId, model));
-				dispatch(setAppStatusAC('succeeded'));
+			tasksApi.updateTask(todolistId, taskId, model).then((res) => {
+				if (res.data.resultCode === ResultCode.Success) {
+					dispatch(updateTaskAC(todolistId, taskId, model));
+					dispatch(setAppStatusAC('succeeded'));
+				} else {
+					if (res.data.messages.length) {
+						dispatch(setAppErrorAC(res.data.messages[0]));
+					} else {
+						dispatch(setAppErrorAC('Some error occurred'));
+					}
+					dispatch(setAppStatusAC('failed'));
+				}
 			});
 		}
 	};

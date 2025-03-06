@@ -9,6 +9,7 @@ import { createSelector } from 'reselect';
 import { useDispatch, useSelector } from 'react-redux';
 import { TodoFilterType } from '@store/todo-reducer';
 import { TaskType } from '../../api/types';
+import { RequestStatus } from '@store/app-reducer';
 
 type TodoListPropsType = {
 	todoListId: string;
@@ -21,6 +22,7 @@ type TodoListPropsType = {
 	changeTaskTitle: (todoListId: string, taskId: string, newTitle: string) => void;
 	changeTodoListTitle: (todoListId: string, newTitle: string) => void;
 	updateTaskStatus: (todoListId: string, taskId: string, newStatus: boolean) => void;
+	entityStatus: RequestStatus;
 };
 
 export const TodoList: FC<TodoListPropsType> = memo(
@@ -35,6 +37,7 @@ export const TodoList: FC<TodoListPropsType> = memo(
 		changeTaskTitle,
 		changeTodoListTitle,
 		updateTaskStatus,
+		entityStatus,
 	}) => {
 		const getTasksState = (state: AppRootState): TasksStateType => state.todoTasks;
 
@@ -49,7 +52,7 @@ export const TodoList: FC<TodoListPropsType> = memo(
 
 		useEffect(() => {
 			dispatch(fetchTasksTC(todoListId));
-		}, []);
+		}, [todoListId, dispatch]);
 
 		let filteredTasks: TaskType[];
 
@@ -67,15 +70,18 @@ export const TodoList: FC<TodoListPropsType> = memo(
 			}
 		}
 
-		const updateTaskStatusHandler = useCallback((taskId: string, newStatus: boolean) => {
-			updateTaskStatus(todoListId, taskId, newStatus);
-		}, []);
+		const updateTaskStatusHandler = useCallback(
+			(taskId: string, newStatus: boolean) => {
+				updateTaskStatus(todoListId, taskId, newStatus);
+			},
+			[todoListId, updateTaskStatus],
+		);
 
 		const removeTaskHandler = useCallback(
 			(taskId: string) => {
 				removeTask(todoListId, taskId);
 			},
-			[todoListId],
+			[todoListId, removeTask],
 		);
 
 		const getFilterStatus = useCallback(
@@ -89,32 +95,32 @@ export const TodoList: FC<TodoListPropsType> = memo(
 			(filterValue: TodoFilterType) => {
 				changeFilterValue(todoListId, filterValue);
 			},
-			[todoListId],
+			[todoListId, changeFilterValue],
 		);
 
 		const addNewTaskHandler = useCallback(
 			(newTaskName: string) => {
 				addNewTask(todoListId, newTaskName);
 			},
-			[todoListId],
+			[todoListId, addNewTask],
 		);
 
 		const removeTodoListHandler = useCallback(() => {
 			removeTodoList(todoListId);
-		}, [todoListId]);
+		}, [todoListId, removeTodoList]);
 
 		const changeTaskTitleHandler = useCallback(
 			(taskId: string, newTitle: string) => {
 				changeTaskTitle(todoListId, taskId, newTitle);
 			},
-			[todoListId],
+			[todoListId, changeTaskTitle],
 		);
 
 		const changeTodoListTitleHandler = useCallback(
 			(newTitle: string) => {
 				changeTodoListTitle(todoListId, newTitle);
 			},
-			[todoListId],
+			[todoListId, changeTodoListTitle],
 		);
 
 		const getTasks =
@@ -129,6 +135,7 @@ export const TodoList: FC<TodoListPropsType> = memo(
 							updateTaskStatus={updateTaskStatusHandler}
 							changeTaskTitle={changeTaskTitleHandler}
 							removeTask={removeTaskHandler}
+							disabled={entityStatus === 'loading'}
 						/>
 					);
 				})
@@ -139,10 +146,17 @@ export const TodoList: FC<TodoListPropsType> = memo(
 		return (
 			<div className={s.todolist}>
 				<div className={s.todolist__title}>
-					<EditSpan title={title} changeTitle={changeTodoListTitleHandler} />
-					<button onClick={removeTodoListHandler}>x</button>
+					<EditSpan title={title} changeTitle={changeTodoListTitleHandler} disabled={entityStatus === 'loading'} />
+					<button onClick={removeTodoListHandler} disabled={entityStatus === 'loading'}>
+						x
+					</button>
 				</div>
-				<AddInput className={s.addNewTask} addItem={addNewTaskHandler} placeholder={'Добавить задачу'} />
+				<AddInput
+					className={s.addNewTask}
+					addItem={addNewTaskHandler}
+					placeholder={'Добавить задачу'}
+					disabled={entityStatus === 'loading'}
+				/>
 				<ul className={s.tasks}>{getTasks}</ul>
 				<div className={s.filter}>
 					<button className={getFilterStatus('all')} onClick={() => changeFilterHandler('all')}>

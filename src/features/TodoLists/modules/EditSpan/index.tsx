@@ -3,27 +3,30 @@ import { ChangeEvent, FC, KeyboardEvent, memo, useCallback, useState } from 'rea
 type EditSpanPropsType = {
 	title: string;
 	changeTitle: (newTitle: string) => void;
+	disabled?: boolean;
 };
 
-export const EditSpan: FC<EditSpanPropsType> = memo(({ title, changeTitle }) => {
+export const EditSpan: FC<EditSpanPropsType> = memo(({ title, changeTitle, disabled }) => {
 	const [edit, setEdit] = useState<boolean>(false);
 	const [newTitle, setNewTitle] = useState(title);
 
 	const onDoubleClickHandler = useCallback(() => {
-		setEdit(true);
-	}, [edit]);
+		if (disabled) return;
 
-	const onChangeInputHandler = useCallback(
-		(e: ChangeEvent<HTMLInputElement>) => {
-			setNewTitle(e.currentTarget.value);
-		},
-		[newTitle],
-	);
+		setEdit(true);
+	}, [disabled]);
+
+	const onChangeInputHandler = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+		setNewTitle(e.currentTarget.value);
+	}, []);
 
 	const confirmChanges = useCallback(() => {
 		setEdit(false);
 		changeTitle(newTitle);
-	}, [edit, newTitle]);
+		if (newTitle.length >= 100) {
+			setNewTitle(title);
+		}
+	}, [title, newTitle, changeTitle]);
 
 	const onBlurInputHandler = useCallback(() => {
 		confirmChanges();

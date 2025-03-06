@@ -1,4 +1,3 @@
-import { TodoListType } from '../../features/TodoLists/api/types';
 import { v1 } from 'uuid';
 import {
 	addNewTodoListAC,
@@ -6,24 +5,21 @@ import {
 	changeTodoListTitleAC,
 	removeTodoListAC,
 	TodoFilterType,
+	TodolistStateType,
 	todoReducer,
 } from '../todo-reducer';
 
-type TodoListLocalType = TodoListType & {
-	filter: TodoFilterType;
-};
-
 let todolistId1: string;
 let todolistId2: string;
-let startState: TodoListLocalType[];
+let startState: TodolistStateType[];
 
 beforeEach(() => {
 	todolistId1 = v1();
 	todolistId2 = v1();
 
 	startState = [
-		{ id: todolistId1, title: 'What to learn', order: 0, addedDate: '', filter: 'all' },
-		{ id: todolistId2, title: 'What to buy', order: 0, addedDate: '', filter: 'all' },
+		{ id: todolistId1, title: 'What to learn', order: 0, addedDate: '', filter: 'all', entityStatus: 'idle' },
+		{ id: todolistId2, title: 'What to buy', order: 0, addedDate: '', filter: 'all', entityStatus: 'idle' },
 	];
 });
 
@@ -35,7 +31,14 @@ test('correct todolist should be removed', () => {
 
 test('correct todolist should be added', () => {
 	const newTodoTitle: string = 'test title';
-	const newTodo: TodoListLocalType = { id: todolistId1, title: newTodoTitle, order: 0, addedDate: '', filter: 'all' };
+	const newTodo: TodolistStateType = {
+		id: todolistId1,
+		title: newTodoTitle,
+		order: 0,
+		addedDate: '',
+		filter: 'all',
+		entityStatus: 'idle',
+	};
 	const endState = todoReducer(startState, addNewTodoListAC(newTodo));
 	expect(endState.length).toBe(3);
 	expect(endState[0].title).toBe(newTodoTitle);
