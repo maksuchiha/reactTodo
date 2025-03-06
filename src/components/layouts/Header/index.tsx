@@ -2,6 +2,7 @@ import s from './header.module.scss';
 import Logo from '@/assets/icons/logo.svg';
 import { Button, ProgressBar } from '@components/ui';
 import { NavLink } from 'react-router-dom';
+import { Paths } from '../../../paths';
 
 type ActiveClassType = {
 	isActive: boolean;
@@ -26,17 +27,17 @@ export const Header = () => {
 						<nav className={s.nav}>
 							<ul className={s.nav__list}>
 								<li className={s.nav__item}>
-									<NavLink to="/doing" className={navLinkClassName}>
+									<NavLink to={Paths.DOING} className={navLinkClassName}>
 										Что делает
 									</NavLink>
 								</li>
 								<li className="header-nav__item">
-									<NavLink to="/offers" className={navLinkClassName}>
+									<NavLink to={Paths.OFFERS} className={navLinkClassName}>
 										Сколько стоит
 									</NavLink>
 								</li>
 								<li className="header-nav__item">
-									<NavLink to="/how-work" className={navLinkClassName}>
+									<NavLink to={Paths.PROTECT_PAGE} className={navLinkClassName}>
 										Как работает
 									</NavLink>
 								</li>

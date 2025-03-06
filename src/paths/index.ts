@@ -7,5 +7,7 @@ export const Paths = {
 	get OFFERS_PAGE() {
 		return `${this.OFFERS}/:productId`;
 	},
+	PROTECT_PAGE: '/protect',
+	LOGIN: '/login',
 	ERROR404: '/error404',
 } as const;
