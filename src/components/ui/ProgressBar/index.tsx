@@ -8,7 +8,7 @@ export const ProgressBar = () => {
 
 	return (
 		<div className={s.wrapper}>
-			<div className={`${s.item} ${status === 'loading' ? s.item_active : ''}`}></div>
+			<div className={status === 'loading' ? s.item : `${s.item} ${s.item_active}`}></div>
 		</div>
 	);
 };

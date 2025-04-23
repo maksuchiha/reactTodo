@@ -1,6 +1,6 @@
 import s from './todolist.module.scss';
 import { FC, memo, useCallback, useEffect } from 'react';
-import { TasksStateType, fetchTasksTC, TaskStatus } from '@store/tasks-reducer';
+import { TasksStateType, fetchTasksTC } from '@store/tasks-reducer';
 import { AddInput } from '@components/ui/AddInput';
 import { EditSpan } from '../EditSpan';
 import { Task } from '../Task';
@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { TodoFilterType } from '@store/todo-reducer';
 import { TaskType } from '../../api/types';
 import { RequestStatus } from '@store/app-reducer';
+import { TaskStatus } from '../../api/types/enums';
 
 type TodoListPropsType = {
 	todoListId: string;

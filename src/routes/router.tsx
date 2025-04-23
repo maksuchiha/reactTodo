@@ -4,6 +4,8 @@ import { App } from '../App';
 import { PrivateRoutes } from './PrivateRoutes';
 import { ProtectedRouter } from './ProtectedRouter';
 import { PublicRoutes } from './PublicRoutes';
+import { Login } from '@pages/Login';
+import { Error404 } from '@pages/Error404';
 
 export const router = createBrowserRouter(
 	[
@@ -19,9 +21,17 @@ export const router = createBrowserRouter(
 				...PublicRoutes,
 			],
 		},
+		{
+			path: `/${Paths.LOGIN}`,
+			element: <Login />,
+		},
+		{
+			path: `/${Paths.ERROR404}`,
+			element: <Error404 />,
+		},
 	],
 	{
-		basename: '/reactTodo', // базовый путь
+		basename: '/reactTodo',
 		future: {
 			v7_startTransition: true,
 		},

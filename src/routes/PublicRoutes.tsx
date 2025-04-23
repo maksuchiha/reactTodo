@@ -3,8 +3,6 @@ import { adidasArr, pumaArr } from '@store/localState';
 import { HomePage } from '@pages/HomePage';
 import { Doing } from '@pages/Doing';
 import { ProductPage } from '@pages/ProductPage';
-import { Error404 } from '@pages/Error404';
-import { Login } from '@pages/Login';
 import { RouteObject } from 'react-router-dom';
 
 export const PublicRoutes: RouteObject[] = [
@@ -27,13 +25,5 @@ export const PublicRoutes: RouteObject[] = [
 	{
 		path: `/${Paths.OFFERS_PAGE}`,
 		element: <ProductPage products={pumaArr} productId={'productId'} />,
-	},
-	{
-		path: `/${Paths.LOGIN}`,
-		element: <Login />,
-	},
-	{
-		path: `/${Paths.ERROR404}`,
-		element: <Error404 />,
 	},
 ];

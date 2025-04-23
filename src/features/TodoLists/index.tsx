@@ -9,10 +9,11 @@ import {
 	TodoFilterType,
 	TodolistStateType,
 } from '@store/todo-reducer';
-import { updateTaskTC, addNewTaskTC, removeTaskTC, TaskStatus } from '@store/tasks-reducer';
+import { updateTaskTC, addNewTaskTC, removeTaskTC } from '@store/tasks-reducer';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppRootState, AppDispatch } from '@store/store';
 import { AddInput } from '@components/ui/AddInput';
+import { TaskStatus } from './api/types/enums';
 
 export const TodoLists: FC = () => {
 	const todoLists = useSelector<AppRootState, TodolistStateType[]>((state) => state.todoLists);

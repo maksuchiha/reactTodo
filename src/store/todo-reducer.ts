@@ -2,7 +2,7 @@ import { TodoListType } from '../features/TodoLists/api/types';
 import { todoListsApi } from '../features/TodoLists/api/todolists-api';
 import { AppThunk } from './store';
 import { RequestStatus, setAppErrorAC, setAppStatusAC } from './app-reducer';
-import { ResultCode } from './tasks-reducer';
+import { ResultCode } from '../features/TodoLists/api/types/enums';
 
 export type TodoFilterType = 'all' | 'completed' | 'progress';
 export type TodolistStateType = TodoListType & {

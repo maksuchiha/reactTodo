@@ -1,28 +1,8 @@
 import { AppRootState, AppThunk } from './store';
 import { tasksApi } from '../features/TodoLists/api/tasks-api';
-import { TaskType } from '../features/TodoLists/api/types';
+import { DomainTaskSchema, TaskType } from '../features/TodoLists/api/types';
 import { setAppErrorAC, setAppStatusAC } from './app-reducer';
-
-export enum TaskStatus {
-	New = 0,
-	InProgress = 1,
-	Completed = 2,
-	Draft = 3,
-}
-
-export enum TaskPriority {
-	Low = 0,
-	Middle = 1,
-	Hi = 2,
-	Urgently = 3,
-	Later = 4,
-}
-
-export enum ResultCode {
-	Success = 0,
-	Error = 1,
-	CaptchaError = 10,
-}
+import { ResultCode } from '../features/TodoLists/api/types/enums';
 
 export type TasksStateType = {
 	[key: string]: TaskType[];
@@ -89,7 +69,7 @@ export const fetchTasksTC =
 		if (!todolistId) return;
 		dispatch(setAppStatusAC('loading'));
 		tasksApi.getTasks(todolistId).then((res) => {
-			const tasks: TaskType[] = res.data.items;
+			const tasks: TaskType[] = DomainTaskSchema.array().parse(res.data.items);
 			dispatch(setTasksAC(todolistId, tasks));
 			dispatch(setAppStatusAC('succeeded'));
 		});
