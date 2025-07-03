@@ -1,15 +1,15 @@
 import s from './todolist.module.scss';
 import { FC, memo, useCallback, useEffect } from 'react';
-import { TasksStateType, fetchTasksTC } from '@store/tasks-reducer';
+import { TasksStateType, fetchTasksTC } from '@store/tasks-thunks';
 import { AddInput } from '@components/ui/AddInput';
 import { EditSpan } from '../EditSpan';
 import { Task } from '../Task';
 import { AppRootState, AppDispatch } from '@store/store';
 import { createSelector } from 'reselect';
 import { useDispatch, useSelector } from 'react-redux';
-import { TodoFilterType } from '@store/todo-reducer';
+import { TodoFilterType } from '@store/todo-thunks';
 import { TaskType } from '../../api/types';
-import { RequestStatus } from '@store/app-reducer';
+import { RequestStatus } from '@store/app-slice';
 import { TaskStatus } from '../../api/types/enums';
 
 type TodoListPropsType = {

@@ -1,18 +1,18 @@
-import { instance } from './instance';
+import { todoInstance } from '@instances/todo';
 import { ResponseType, TaskType } from './types';
-import { TasksStateType } from '@store/tasks-reducer';
+import { TasksStateType } from '@store/tasks-slice';
 
 export const tasksApi = {
 	createTask(todolistId: string, title: string) {
-		return instance.post<ResponseType<{ item: TaskType }>>(`todo-lists/${todolistId}/tasks`, { title });
+		return todoInstance.post<ResponseType<{ item: TaskType }>>(`todo-lists/${todolistId}/tasks`, { title });
 	},
 	getTasks(todolistId: string) {
-		return instance.get<TasksStateType>(`todo-lists/${todolistId}/tasks`);
+		return todoInstance.get<TasksStateType>(`todo-lists/${todolistId}/tasks`);
 	},
 	deleteTask(todolistId: string, taskId: string) {
-		return instance.delete<ResponseType>(`todo-lists/${todolistId}/tasks/${taskId}`);
+		return todoInstance.delete<ResponseType>(`todo-lists/${todolistId}/tasks/${taskId}`);
 	},
 	updateTask(todolistId: string, taskId: string, task: TaskType) {
-		return instance.put<ResponseType>(`todo-lists/${todolistId}/tasks/${taskId}`, task);
+		return todoInstance.put<ResponseType>(`todo-lists/${todolistId}/tasks/${taskId}`, task);
 	},
 };

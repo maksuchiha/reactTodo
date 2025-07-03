@@ -34,6 +34,7 @@ export const router = createBrowserRouter(
 		basename: '/reactTodo',
 		future: {
 			v7_startTransition: true,
-		},
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} as any,
 	},
 );

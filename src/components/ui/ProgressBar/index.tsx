@@ -1,7 +1,7 @@
 import s from './ProgressBar.module.scss';
 import { useSelector } from 'react-redux';
 import { AppRootState } from '@store/store';
-import { RequestStatus } from '@store/app-reducer';
+import { RequestStatus } from '@store/app-slice';
 
 export const ProgressBar = () => {
 	const status = useSelector<AppRootState, RequestStatus>((state) => state.ui.status);

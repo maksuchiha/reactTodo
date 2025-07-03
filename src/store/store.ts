@@ -1,19 +1,17 @@
-import { todoReducer, TodoReducerACType } from './todo-reducer';
 import { combineReducers } from 'redux';
-import { Action, configureStore, ThunkAction, ThunkDispatch } from '@reduxjs/toolkit';
-import { tasksReducer, TasksReducerACType } from './tasks-reducer';
-import { appReducer, AppReducerACType } from './app-reducer';
+import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit';
+import { appReducer } from './app-slice';
+import { todolistsReducer } from './todo-slice';
+import { tasksReducer } from './tasks-slice';
 
 const rootReducer = combineReducers({
-	todoLists: todoReducer,
+	todoLists: todolistsReducer,
 	todoTasks: tasksReducer,
 	ui: appReducer,
 });
 
-export type AppActionsTypes = TodoReducerACType | TasksReducerACType | AppReducerACType;
-
 export type AppRootState = ReturnType<typeof rootReducer>;
-export type AppDispatch<A extends Action = AppActionsTypes> = ThunkDispatch<AppRootState, unknown, A>;
+export type AppDispatch = typeof store.dispatch;
 export type AppThunk<ReturnType = void> = ThunkAction<ReturnType, AppRootState, unknown, Action>;
 
 export const store = configureStore({

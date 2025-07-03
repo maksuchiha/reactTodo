@@ -3,17 +3,17 @@ import { FC, useCallback } from 'react';
 import s from './todolists.module.scss';
 import {
 	addNewTodoListTC,
-	changeTodoListFilterAC,
 	changeTodoListTitleTC,
 	removeTodoListTC,
 	TodoFilterType,
 	TodolistStateType,
-} from '@store/todo-reducer';
-import { updateTaskTC, addNewTaskTC, removeTaskTC } from '@store/tasks-reducer';
+} from '@store/todo-thunks';
+import { updateTaskTC, addNewTaskTC, removeTaskTC } from '@store/tasks-thunks';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppRootState, AppDispatch } from '@store/store';
 import { AddInput } from '@components/ui/AddInput';
 import { TaskStatus } from './api/types/enums';
+import { changeTodoListFilterAC } from '../../store/todo-slice';
 
 export const TodoLists: FC = () => {
 	const todoLists = useSelector<AppRootState, TodolistStateType[]>((state) => state.todoLists);
@@ -21,7 +21,7 @@ export const TodoLists: FC = () => {
 
 	const changeFilterValue = useCallback(
 		(todoListId: string, filterValue: TodoFilterType) => {
-			dispatch(changeTodoListFilterAC(todoListId, filterValue));
+			dispatch(changeTodoListFilterAC({ todoListId, filterValue }));
 		},
 		[dispatch],
 	);
