@@ -1,11 +1,11 @@
 import { Snackbar } from '@components/ui/Snackbar';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppRootState, AppDispatch } from '@store/store';
+import { AppRootState, AppDispatchType } from '@store/store';
 import { AppReducerType, setAppErrorAC } from '@store/app-slice';
 
 export const ErrorSnackbar = () => {
 	const curError = useSelector<AppRootState, AppReducerType>((state) => state.ui);
-	const dispatch = useDispatch<AppDispatch>();
+	const dispatch = useDispatch<AppDispatchType>();
 
 	const changeStatusHandler = (newStatus: null) => {
 		dispatch(setAppErrorAC(newStatus));

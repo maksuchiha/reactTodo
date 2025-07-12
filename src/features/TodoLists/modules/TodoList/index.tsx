@@ -4,13 +4,13 @@ import { TasksStateType, fetchTasksTC } from '@store/tasks-thunks';
 import { AddInput } from '@components/ui/AddInput';
 import { EditSpan } from '../EditSpan';
 import { Task } from '../Task';
-import { AppRootState, AppDispatch } from '@store/store';
+import { AppRootState, AppDispatchType } from '@store/store';
 import { createSelector } from 'reselect';
 import { useDispatch, useSelector } from 'react-redux';
-import { TodoFilterType } from '@store/todo-thunks';
 import { TaskType } from '../../api/types';
 import { RequestStatus } from '@store/app-slice';
 import { TaskStatus } from '../../api/types/enums';
+import { TodoFilterType } from '@features/TodoLists';
 
 type TodoListPropsType = {
 	todoListId: string;
@@ -49,7 +49,7 @@ export const TodoList: FC<TodoListPropsType> = memo(
 
 		const tasksForTodoList = useSelector((state: AppRootState) => selectTasksForTodoList(state, todoListId));
 
-		const dispatch = useDispatch<AppDispatch>();
+		const dispatch = useDispatch<AppDispatchType>();
 
 		useEffect(() => {
 			dispatch(fetchTasksTC(todoListId));

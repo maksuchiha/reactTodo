@@ -1,10 +1,14 @@
 import { defineConfig } from 'vitest/config';
+import path from 'path';
 
 export default defineConfig({
+	resolve: {
+		alias: {
+			'@instances': path.resolve(__dirname, './src/utils/axios/instances'),
+		},
+	},
 	test: {
-		environment: 'jsdom',
-		setupFiles: './src/setupTests.ts',
 		globals: true,
-		exclude: ['**/node_modules/**', '**/*.e2e.{js,ts}'],
+		environment: 'jsdom',
 	},
 });

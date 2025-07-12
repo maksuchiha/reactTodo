@@ -3,12 +3,12 @@ import { Header } from '@components/layouts/Header';
 import { Footer } from '@components/layouts/Footer';
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { fetchTodoListsTC } from '@store/todo-thunks';
-import { AppDispatch } from '@store/store';
 import { ErrorSnackbar } from './components/ui/ErrorSnackbar';
+import { fetchTodoListsTC } from './store/todo-thunks';
+import { AppDispatchType } from './store/store';
 
 export const App = () => {
-	const dispatch = useDispatch<AppDispatch>();
+	const dispatch = useDispatch<AppDispatchType>();
 	useEffect(() => {
 		dispatch(fetchTodoListsTC());
 	}, [dispatch]);

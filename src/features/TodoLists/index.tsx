@@ -1,23 +1,25 @@
 import { TodoList } from './modules';
 import { FC, useCallback } from 'react';
 import s from './todolists.module.scss';
-import {
-	addNewTodoListTC,
-	changeTodoListTitleTC,
-	removeTodoListTC,
-	TodoFilterType,
-	TodolistStateType,
-} from '@store/todo-thunks';
+import { addNewTodoListTC, changeTodoListTitleTC, removeTodoListTC } from '@store/todo-thunks';
 import { updateTaskTC, addNewTaskTC, removeTaskTC } from '@store/tasks-thunks';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppRootState, AppDispatch } from '@store/store';
+import { AppRootState, AppDispatchType } from '@store/store';
 import { AddInput } from '@components/ui/AddInput';
 import { TaskStatus } from './api/types/enums';
 import { changeTodoListFilterAC } from '../../store/todo-slice';
+import { TodoListType } from './api/types';
+import { RequestStatus } from '@store/app-slice';
+
+export type TodoFilterType = 'all' | 'completed' | 'progress';
+export type TodolistStateType = TodoListType & {
+	filter: TodoFilterType;
+	entityStatus: RequestStatus;
+};
 
 export const TodoLists: FC = () => {
 	const todoLists = useSelector<AppRootState, TodolistStateType[]>((state) => state.todoLists);
-	const dispatch = useDispatch<AppDispatch>();
+	const dispatch = useDispatch<AppDispatchType>();
 
 	const changeFilterValue = useCallback(
 		(todoListId: string, filterValue: TodoFilterType) => {
@@ -71,8 +73,8 @@ export const TodoLists: FC = () => {
 	);
 
 	const changeTodoListTitle = useCallback(
-		(todoListId: string, newTitle: string) => {
-			dispatch(changeTodoListTitleTC(todoListId, newTitle));
+		(todolistId: string, newTitle: string) => {
+			dispatch(changeTodoListTitleTC({ todolistId, newTitle }));
 		},
 		[dispatch],
 	);
