@@ -1,5 +1,5 @@
 import { todoInstance } from '@instances/todo';
-import { ResponseType, TaskType } from './types';
+import { ResponseType, TaskType, UpdateTaskModel } from './types';
 import { TasksStateType } from '@store/tasks-slice';
 
 export const tasksApi = {
@@ -12,7 +12,7 @@ export const tasksApi = {
 	deleteTask(todolistId: string, taskId: string) {
 		return todoInstance.delete<ResponseType>(`todo-lists/${todolistId}/tasks/${taskId}`);
 	},
-	updateTask(todolistId: string, taskId: string, task: TaskType) {
+	updateTask(todolistId: string, taskId: string, task: UpdateTaskModel) {
 		return todoInstance.put<ResponseType>(`todo-lists/${todolistId}/tasks/${taskId}`, task);
 	},
 };

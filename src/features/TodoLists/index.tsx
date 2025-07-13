@@ -31,7 +31,7 @@ export const TodoLists: FC = () => {
 		(todoListId: string, taskId: string, newStatus: boolean) => {
 			const getStatusNumber = newStatus ? TaskStatus.Completed : TaskStatus.New;
 
-			dispatch(updateTaskTC({ todolistId: todoListId, taskId, newValue: getStatusNumber }));
+			dispatch(updateTaskTC({ todolistId: todoListId, taskId, domainModel: { status: getStatusNumber } }));
 		},
 		[dispatch],
 	);
@@ -66,7 +66,7 @@ export const TodoLists: FC = () => {
 
 	const changeTaskTitle = useCallback(
 		(todoListId: string, taskId: string, newTitle: string) => {
-			dispatch(updateTaskTC({ todolistId: todoListId, taskId, newValue: newTitle }));
+			dispatch(updateTaskTC({ todolistId: todoListId, taskId, domainModel: { title: newTitle } }));
 		},
 		[dispatch],
 	);

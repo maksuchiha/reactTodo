@@ -1,6 +1,6 @@
 import { v1 } from 'uuid';
 import { addNewTaskTC, removeTaskTC, tasksReducer, TasksStateType, updateTaskTC } from '../tasks-slice';
-import { TaskType } from '@features/TodoLists/api/types';
+import { TaskType, UpdateTaskModel } from '@features/TodoLists/api/types';
 import { TaskStatus } from '@features/TodoLists/api/types/enums';
 
 let todolistId1: string;
@@ -125,28 +125,22 @@ test('correct todolist task be removed', () => {
 });
 
 test('correct todolist task be updated', () => {
-	const taskTitle = 'test title';
-	const taskStatus = TaskStatus.New;
-	const updatedTask: TaskType = {
-		addedDate: '',
-		deadline: '',
-		description: '',
-		id: '1',
-		order: 0,
-		priority: 1,
-		startDate: '',
-		status: taskStatus,
-		title: taskTitle,
-		todoListId: todolistId1,
+	// Только поля, которые реально были изменены
+	const updatedFields: Partial<UpdateTaskModel> = {
+		title: 'test title',
+		status: TaskStatus.New,
 	};
-	const action = updateTaskTC.fulfilled({ todolistId: todolistId1, taskId: '1', updatedTask }, 'task removed id', {
+
+	const action = updateTaskTC.fulfilled({ todolistId: todolistId1, taskId: '1', updatedFields }, 'requestId', {
 		todolistId: todolistId1,
 		taskId: '1',
-		newValue: taskTitle,
+		domainModel: updatedFields,
 	});
+
 	const endState = tasksReducer(startState, action);
+
 	expect(endState[todolistId1][0].id).toBe('1');
 	expect(endState[todolistId1].length).toBe(3);
-	expect(endState[todolistId1][0].title).toBe(taskTitle);
-	expect(endState[todolistId1][0].status).toBe(taskStatus);
+	expect(endState[todolistId1][0].title).toBe(updatedFields.title);
+	expect(endState[todolistId1][0].status).toBe(updatedFields.status);
 });

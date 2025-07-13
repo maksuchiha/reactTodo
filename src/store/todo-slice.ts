@@ -53,7 +53,7 @@ export const todoListsSlice = createAppSlice({
 						filter: 'all',
 						entityStatus: 'idle',
 					};
-					return [newTodoList, ...state];
+					state.unshift(newTodoList);
 				},
 			},
 		),

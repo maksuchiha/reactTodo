@@ -14,4 +14,15 @@ export const DomainTaskSchema = z.object({
 	addedDate: z.string(),
 });
 
+export const UpdateTaskModelSchema = DomainTaskSchema.pick({
+	title: true,
+	description: true,
+	status: true,
+	priority: true,
+	startDate: true,
+	deadline: true,
+});
+
+export type UpdateTaskModel = z.infer<typeof UpdateTaskModelSchema>;
+
 export type TaskType = z.infer<typeof DomainTaskSchema>;

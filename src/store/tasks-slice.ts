@@ -1,9 +1,10 @@
-import { TaskType } from '@features/TodoLists/api/types';
+import { TaskType, UpdateTaskModel } from '@features/TodoLists/api/types';
 import { createAppSlice } from '../utils/thunks/todo';
 import { setAppErrorAC, setAppStatusAC } from './app-slice';
 import { tasksApi } from '@features/TodoLists/api/tasks-api';
 import { ResultCode } from '@features/TodoLists/api/types/enums';
 import { AppDispatchType, AppRootState } from '@store/store';
+import { removeTodoListTC } from '@store/todo-slice';
 
 export type TasksStateType = {
 	[key: string]: TaskType[];
@@ -78,63 +79,54 @@ const tasksSlice = createAppSlice({
 			},
 		),
 		updateTaskTC: create.asyncThunk(
-			async (payload: { todolistId: string; taskId: string; newValue: string | number }, thunkAPI) => {
-				thunkAPI.dispatch(setAppStatusAC('loading'));
+			async (
+				payload: { todolistId: string; taskId: string; domainModel: Partial<UpdateTaskModel> },
+				{ dispatch, getState, rejectWithValue },
+			) => {
+				dispatch(setAppStatusAC('loading'));
 
-				const state = thunkAPI.getState() as AppRootState;
-				const task = state.todoTasks[payload.todolistId].find((t: TaskType) => t.id === payload.taskId);
-				let updatedTask: TaskType;
+				const state = getState() as AppRootState;
+				const task = state.todoTasks[payload.todolistId]?.find((t: TaskType) => t.id === payload.taskId);
 
 				if (!task) {
-					thunkAPI.dispatch(setAppErrorAC('Task not found'));
-					return thunkAPI.rejectWithValue(`Failed to update task`);
+					dispatch(setAppErrorAC('Task not found'));
+					return rejectWithValue('Failed to update task: not found');
 				}
 
-				switch (typeof payload.newValue) {
-					case 'string': {
-						updatedTask = {
-							...task,
-							title: payload.newValue,
-						};
-						break;
-					}
-					case 'number': {
-						updatedTask = {
-							...task,
-							status: payload.newValue,
-						};
-						break;
-					}
-					default: {
-						updatedTask = { ...task };
-					}
+				// Создаём полную модель для API из текущей задачи + переданных полей
+				const updatedTask: UpdateTaskModel = {
+					title: task.title,
+					description: task.description,
+					status: task.status,
+					priority: task.priority,
+					startDate: task.startDate,
+					deadline: task.deadline,
+					...payload.domainModel, // заменяем нужные поля
+				};
+
+				try {
+					const res = await tasksApi.updateTask(payload.todolistId, payload.taskId, updatedTask);
+					handleServerAppResponse(res, dispatch as AppDispatchType);
+					return { todolistId: payload.todolistId, taskId: payload.taskId, updatedFields: payload.domainModel };
+				} catch (error) {
+					return rejectWithValue(`Failed to update task ${error}`);
 				}
-				const res = await tasksApi.updateTask(payload.todolistId, payload.taskId, updatedTask);
-				handleServerAppResponse(res, thunkAPI.dispatch as AppDispatchType);
-				return { todolistId: payload.todolistId, taskId: payload.taskId, updatedTask };
 			},
 			{
 				fulfilled: (state, action) => {
 					state[action.payload.todolistId] = state[action.payload.todolistId].map((t) =>
-						t.id === action.payload.taskId ? { ...action.payload.updatedTask } : t,
+						t.id === action.payload.taskId ? { ...t, ...action.payload.updatedFields } : t,
 					);
 				},
 			},
 		),
-		// updateTaskAC: create.reducer<{ todolistId: string; taskId: string; updatedTask: TaskType }>((state, action) => {
-		// 	return {
-		// 		...state,
-		// 		[action.payload.todolistId]: state[action.payload.todolistId].map((t) =>
-		// 			t.id === action.payload.taskId ? { ...action.payload.updatedTask } : t,
-		// 		),
-		// 	};
-		// }),
-		addNewTodoListAC: create.reducer<{ todolistId: string }>((state, action) => {
-			const newState = { ...state };
-			delete newState[action.payload.todolistId];
-			return newState;
-		}),
 	}),
+	extraReducers: (builder) => {
+		builder.addCase(removeTodoListTC.fulfilled, (state, action) => {
+			if (!action.payload?.todolistId) return;
+			delete state[action.payload.todolistId];
+		});
+	},
 });
 
 export const { fetchTasksTC, removeTaskTC, updateTaskTC, addNewTaskTC } = tasksSlice.actions;
