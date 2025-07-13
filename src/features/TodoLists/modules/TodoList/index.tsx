@@ -1,6 +1,5 @@
 import s from './todolist.module.scss';
 import { FC, memo, useCallback, useEffect } from 'react';
-import { TasksStateType, fetchTasksTC } from '@store/tasks-thunks';
 import { AddInput } from '@components/ui/AddInput';
 import { EditSpan } from '../EditSpan';
 import { Task } from '../Task';
@@ -8,9 +7,11 @@ import { AppRootState, AppDispatchType } from '@store/store';
 import { createSelector } from 'reselect';
 import { useDispatch, useSelector } from 'react-redux';
 import { TaskType } from '../../api/types';
-import { RequestStatus } from '@store/app-slice';
+import { AppReducerType } from '@store/app-slice';
 import { TaskStatus } from '../../api/types/enums';
 import { TodoFilterType } from '@features/TodoLists';
+import { fetchTasksTC } from '@store/tasks-slice';
+import { TasksStateType } from '@store/tasks-slice';
 
 type TodoListPropsType = {
 	todoListId: string;
@@ -23,7 +24,6 @@ type TodoListPropsType = {
 	changeTaskTitle: (todoListId: string, taskId: string, newTitle: string) => void;
 	changeTodoListTitle: (todoListId: string, newTitle: string) => void;
 	updateTaskStatus: (todoListId: string, taskId: string, newStatus: boolean) => void;
-	entityStatus: RequestStatus;
 };
 
 export const TodoList: FC<TodoListPropsType> = memo(
@@ -38,7 +38,6 @@ export const TodoList: FC<TodoListPropsType> = memo(
 		changeTaskTitle,
 		changeTodoListTitle,
 		updateTaskStatus,
-		entityStatus,
 	}) => {
 		const getTasksState = (state: AppRootState): TasksStateType => state.todoTasks;
 
@@ -48,6 +47,7 @@ export const TodoList: FC<TodoListPropsType> = memo(
 		);
 
 		const tasksForTodoList = useSelector((state: AppRootState) => selectTasksForTodoList(state, todoListId));
+		const entityStatus = useSelector<AppRootState, AppReducerType>((state) => state.ui);
 
 		const dispatch = useDispatch<AppDispatchType>();
 
@@ -136,7 +136,7 @@ export const TodoList: FC<TodoListPropsType> = memo(
 							updateTaskStatus={updateTaskStatusHandler}
 							changeTaskTitle={changeTaskTitleHandler}
 							removeTask={removeTaskHandler}
-							disabled={entityStatus === 'loading'}
+							disabled={entityStatus.status === 'loading'}
 						/>
 					);
 				})
@@ -147,8 +147,12 @@ export const TodoList: FC<TodoListPropsType> = memo(
 		return (
 			<div className={s.todolist}>
 				<div className={s.todolist__title}>
-					<EditSpan title={title} changeTitle={changeTodoListTitleHandler} disabled={entityStatus === 'loading'} />
-					<button onClick={removeTodoListHandler} disabled={entityStatus === 'loading'}>
+					<EditSpan
+						title={title}
+						changeTitle={changeTodoListTitleHandler}
+						disabled={entityStatus.status === 'loading'}
+					/>
+					<button onClick={removeTodoListHandler} disabled={entityStatus.status === 'loading'}>
 						x
 					</button>
 				</div>
@@ -156,7 +160,7 @@ export const TodoList: FC<TodoListPropsType> = memo(
 					className={s.addNewTask}
 					addItem={addNewTaskHandler}
 					placeholder={'Добавить задачу'}
-					disabled={entityStatus === 'loading'}
+					disabled={entityStatus.status === 'loading'}
 				/>
 				<ul className={s.tasks}>{getTasks}</ul>
 				<div className={s.filter}>

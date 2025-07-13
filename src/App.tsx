@@ -4,8 +4,8 @@ import { Footer } from '@components/layouts/Footer';
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { ErrorSnackbar } from './components/ui/ErrorSnackbar';
-import { fetchTodoListsTC } from './store/todo-thunks';
-import { AppDispatchType } from './store/store';
+import { AppDispatchType } from '@store/store';
+import { fetchTodoListsTC } from '@store/todo-slice';
 
 export const App = () => {
 	const dispatch = useDispatch<AppDispatchType>();

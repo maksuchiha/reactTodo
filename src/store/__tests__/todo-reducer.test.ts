@@ -1,6 +1,13 @@
 import { v1 } from 'uuid';
-import { changeTodoListFilterAC, TodoFilterType, TodolistStateType, todoListsReducer } from '../todo-slice';
-import { addNewTodoListTC, changeTodoListTitleTC, removeTodoListTC } from '../todo-thunks';
+import {
+	changeTodoListFilterAC,
+	TodoFilterType,
+	TodolistStateType,
+	todoListsReducer,
+	removeTodoListTC,
+	addNewTodoListTC,
+	changeTodoListTitleTC,
+} from '../todo-slice';
 
 let todolistId1: string;
 let todolistId2: string;

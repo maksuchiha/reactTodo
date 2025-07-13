@@ -1,7 +1,7 @@
 import { v1 } from 'uuid';
-import { addNewTaskAC, removeTaskAC, tasksReducer, TasksStateType, updateTaskAC } from '../tasks-slice';
-import { TaskType } from '../../features/TodoLists/api/types';
-import { TaskStatus } from '../../features/TodoLists/api/types/enums';
+import { addNewTaskTC, removeTaskTC, tasksReducer, TasksStateType, updateTaskTC } from '../tasks-slice';
+import { TaskType } from '@features/TodoLists/api/types';
+import { TaskStatus } from '@features/TodoLists/api/types/enums';
 
 let todolistId1: string;
 let todolistId2: string;
@@ -105,13 +105,21 @@ test('correct todolist task be added', () => {
 		title: taskTitle,
 		todoListId: todolistId1,
 	};
-	const endState = tasksReducer(startState, addNewTaskAC({ todolistId: todolistId1, newTask }));
+	const action = addNewTaskTC.fulfilled({ todolistId: todolistId1, newTask }, '', {
+		todolistId: todolistId1,
+		title: taskTitle,
+	});
+	const endState = tasksReducer(startState, action);
 	expect(endState[todolistId1][0].title).toBe(taskTitle);
 	expect(endState[todolistId1].length).toBe(4);
 });
 
 test('correct todolist task be removed', () => {
-	const endState = tasksReducer(startState, removeTaskAC({ todolistId: todolistId1, taskId: '1' }));
+	const action = removeTaskTC.fulfilled({ todolistId: todolistId1, taskId: '1' }, 'task removed id', {
+		todolistId: todolistId1,
+		taskId: '1',
+	});
+	const endState = tasksReducer(startState, action);
 	expect(endState[todolistId1][0].id).toBe('2');
 	expect(endState[todolistId1].length).toBe(2);
 });
@@ -131,7 +139,12 @@ test('correct todolist task be updated', () => {
 		title: taskTitle,
 		todoListId: todolistId1,
 	};
-	const endState = tasksReducer(startState, updateTaskAC({ todolistId: todolistId1, taskId: '1', updatedTask }));
+	const action = updateTaskTC.fulfilled({ todolistId: todolistId1, taskId: '1', updatedTask }, 'task removed id', {
+		todolistId: todolistId1,
+		taskId: '1',
+		newValue: taskTitle,
+	});
+	const endState = tasksReducer(startState, action);
 	expect(endState[todolistId1][0].id).toBe('1');
 	expect(endState[todolistId1].length).toBe(3);
 	expect(endState[todolistId1][0].title).toBe(taskTitle);

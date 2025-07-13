@@ -1,15 +1,14 @@
 import { TodoList } from './modules';
 import { FC, useCallback } from 'react';
 import s from './todolists.module.scss';
-import { addNewTodoListTC, changeTodoListTitleTC, removeTodoListTC } from '@store/todo-thunks';
-import { updateTaskTC, addNewTaskTC, removeTaskTC } from '@store/tasks-thunks';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppRootState, AppDispatchType } from '@store/store';
 import { AddInput } from '@components/ui/AddInput';
 import { TaskStatus } from './api/types/enums';
-import { changeTodoListFilterAC } from '../../store/todo-slice';
+import { addNewTodoListTC, changeTodoListFilterAC, changeTodoListTitleTC, removeTodoListTC } from '@store/todo-slice';
 import { TodoListType } from './api/types';
 import { RequestStatus } from '@store/app-slice';
+import { addNewTaskTC, removeTaskTC, updateTaskTC } from '@store/tasks-slice';
 
 export type TodoFilterType = 'all' | 'completed' | 'progress';
 export type TodolistStateType = TodoListType & {
@@ -32,21 +31,21 @@ export const TodoLists: FC = () => {
 		(todoListId: string, taskId: string, newStatus: boolean) => {
 			const getStatusNumber = newStatus ? TaskStatus.Completed : TaskStatus.New;
 
-			dispatch(updateTaskTC(todoListId, taskId, getStatusNumber));
+			dispatch(updateTaskTC({ todolistId: todoListId, taskId, newValue: getStatusNumber }));
 		},
 		[dispatch],
 	);
 
 	const removeTask = useCallback(
 		(todoListId: string, taskId: string) => {
-			dispatch(removeTaskTC(todoListId, taskId));
+			dispatch(removeTaskTC({ todolistId: todoListId, taskId }));
 		},
 		[dispatch],
 	);
 
 	const addNewTask = useCallback(
 		(todoListId: string, newTaskName: string) => {
-			dispatch(addNewTaskTC(todoListId, newTaskName));
+			dispatch(addNewTaskTC({ todolistId: todoListId, title: newTaskName }));
 		},
 		[dispatch],
 	);
@@ -67,7 +66,7 @@ export const TodoLists: FC = () => {
 
 	const changeTaskTitle = useCallback(
 		(todoListId: string, taskId: string, newTitle: string) => {
-			dispatch(updateTaskTC(todoListId, taskId, newTitle));
+			dispatch(updateTaskTC({ todolistId: todoListId, taskId, newValue: newTitle }));
 		},
 		[dispatch],
 	);
@@ -93,7 +92,6 @@ export const TodoLists: FC = () => {
 				changeTaskTitle={changeTaskTitle}
 				changeTodoListTitle={changeTodoListTitle}
 				updateTaskStatus={updateTaskStatus}
-				entityStatus={tl.entityStatus}
 			/>
 		);
 	});
