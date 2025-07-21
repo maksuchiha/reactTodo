@@ -16,11 +16,9 @@ export const appSlice = createSlice({
 	// reducers состоит из подредьюсеров, эквивалентных одному оператору case в switch
 	reducers: (create) => ({
 		setAppStatusAC: create.reducer<RequestStatus>((state, action) => {
-			// логика в подредьюсерах мутабельная, а иммутабельность достигается благодаря immer.js
 			state.status = action.payload;
 		}),
 		setAppErrorAC: create.reducer<string | null>((state, action) => {
-			// логика в подредьюсерах мутабельная, а иммутабельность достигается благодаря immer.js
 			state.error = action.payload;
 		}),
 	}),

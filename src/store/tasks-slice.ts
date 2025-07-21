@@ -2,30 +2,15 @@ import { TaskType, UpdateTaskModel } from '@features/TodoLists/api/types';
 import { createAppSlice } from '../utils/thunks/todo';
 import { setAppErrorAC, setAppStatusAC } from './app-slice';
 import { tasksApi } from '@features/TodoLists/api/tasks-api';
-import { ResultCode } from '@features/TodoLists/api/types/enums';
-import { AppDispatchType, AppRootState } from '@store/store';
+import { AppRootState } from '@store/store';
 import { removeTodoListTC } from '@store/todo-slice';
+import axios from 'axios';
+import { handleServerAppError } from '../utils/serverResponse/handleServerAppError';
+import { ResultCode } from '@features/TodoLists/api/types/enums';
+import { handleServerNetworkError } from '../utils/serverResponse/handleServerNetworkError';
 
 export type TasksStateType = {
 	[key: string]: TaskType[];
-};
-
-export const handleServerAppResponse = (
-	res: { data: { resultCode: number; messages: string[] } },
-	dispatch: AppDispatchType,
-): boolean => {
-	if (res.data.resultCode === ResultCode.Success) {
-		dispatch(setAppStatusAC('succeeded'));
-		return true;
-	} else {
-		if (res.data.messages.length) {
-			dispatch(setAppErrorAC(res.data.messages[0]));
-		} else {
-			dispatch(setAppErrorAC('Some error occurred'));
-		}
-		dispatch(setAppStatusAC('failed'));
-		return false;
-	}
 };
 
 const tasksSlice = createAppSlice({
@@ -41,7 +26,14 @@ const tasksSlice = createAppSlice({
 					thunkAPI.dispatch(setAppStatusAC('succeeded'));
 					return { todolistId, tasks: res.data.items };
 				} catch (error) {
-					return thunkAPI.rejectWithValue(`Failed to fetch tasks - ${error}`);
+					if (axios.isAxiosError(error)) {
+						// handleServerAppResponse(error, thunkAPI.dispatch, thunkAPI.rejectWithValue);
+						return thunkAPI.rejectWithValue(`fetch tasks error- ${error.message}`);
+					} else {
+						thunkAPI.dispatch(setAppErrorAC(`Unexpected error occurred ${error}`));
+						thunkAPI.dispatch(setAppStatusAC('failed'));
+						return thunkAPI.rejectWithValue(`Unexpected error occurred ${error}`);
+					}
 				}
 			},
 			{
@@ -53,9 +45,19 @@ const tasksSlice = createAppSlice({
 		removeTaskTC: create.asyncThunk(
 			async (payload: { todolistId: string; taskId: string }, thunkAPI) => {
 				thunkAPI.dispatch(setAppStatusAC('loading'));
-				const res = await tasksApi.deleteTask(payload.todolistId, payload.taskId);
-				handleServerAppResponse(res, thunkAPI.dispatch as AppDispatchType);
-				return { todolistId: payload.todolistId, taskId: payload.taskId };
+				try {
+					const res = await tasksApi.deleteTask(payload.todolistId, payload.taskId);
+					if (res.data.resultCode === ResultCode.Success) {
+						thunkAPI.dispatch(setAppStatusAC('succeeded'));
+						return { todolistId: payload.todolistId, taskId: payload.taskId };
+					} else {
+						handleServerAppError(res.data, thunkAPI.dispatch);
+						return thunkAPI.rejectWithValue(`Remove task error`);
+					}
+				} catch (error: unknown) {
+					handleServerNetworkError(error, thunkAPI.dispatch);
+					return thunkAPI.rejectWithValue(`Remove task error`);
+				}
 			},
 			{
 				fulfilled: (state, action) => {
@@ -68,9 +70,19 @@ const tasksSlice = createAppSlice({
 		addNewTaskTC: create.asyncThunk(
 			async (payload: { todolistId: string; title: string }, thunkAPI) => {
 				thunkAPI.dispatch(setAppStatusAC('loading'));
-				const res = await tasksApi.createTask(payload.todolistId, payload.title);
-				handleServerAppResponse(res, thunkAPI.dispatch as AppDispatchType);
-				return { newTask: res.data.data.item, todolistId: payload.todolistId };
+				try {
+					const res = await tasksApi.createTask(payload.todolistId, payload.title);
+					if (res.data.resultCode === ResultCode.Success) {
+						thunkAPI.dispatch(setAppStatusAC('succeeded'));
+						return { newTask: res.data.data.item, todolistId: payload.todolistId };
+					} else {
+						handleServerAppError(res.data, thunkAPI.dispatch);
+						return thunkAPI.rejectWithValue(`Add new task error`);
+					}
+				} catch (error: unknown) {
+					handleServerNetworkError(error, thunkAPI.dispatch);
+					return thunkAPI.rejectWithValue(`Add new task error`);
+				}
 			},
 			{
 				fulfilled: (state, action) => {
@@ -106,10 +118,17 @@ const tasksSlice = createAppSlice({
 
 				try {
 					const res = await tasksApi.updateTask(payload.todolistId, payload.taskId, updatedTask);
-					handleServerAppResponse(res, dispatch as AppDispatchType);
-					return { todolistId: payload.todolistId, taskId: payload.taskId, updatedFields: payload.domainModel };
-				} catch (error) {
-					return rejectWithValue(`Failed to update task ${error}`);
+
+					if (res.data.resultCode === ResultCode.Success) {
+						dispatch(setAppStatusAC('succeeded'));
+						return { todolistId: payload.todolistId, taskId: payload.taskId, updatedFields: payload.domainModel };
+					} else {
+						handleServerAppError(res.data, dispatch);
+						return rejectWithValue(`Failed to update task`);
+					}
+				} catch (error: unknown) {
+					handleServerNetworkError(error, dispatch);
+					return rejectWithValue(`Failed to update task`);
 				}
 			},
 			{

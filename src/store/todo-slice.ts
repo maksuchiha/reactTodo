@@ -1,8 +1,10 @@
 import { TodoListType } from '@features/TodoLists/api/types';
-import { RequestStatus, setAppErrorAC, setAppStatusAC } from './app-slice';
+import { RequestStatus, setAppStatusAC } from './app-slice';
 import { todoListsApi } from '@features/TodoLists/api/todolists-api';
 import { createAppSlice } from '../utils/thunks/todo';
 import { ResultCode } from '@features/TodoLists/api/types/enums';
+import { handleServerAppError } from '../utils/serverResponse/handleServerAppError';
+import { handleServerNetworkError } from '../utils/serverResponse/handleServerNetworkError';
 
 export type TodoFilterType = 'all' | 'completed' | 'progress';
 export type TodolistStateType = TodoListType & {
@@ -22,6 +24,7 @@ export const todoListsSlice = createAppSlice({
 					thunkAPI.dispatch(setAppStatusAC('succeeded'));
 					return { todoLists: res.data };
 				} catch (error) {
+					handleServerNetworkError(error, thunkAPI.dispatch);
 					return thunkAPI.rejectWithValue(`Failed to fetch todoLists - ${error}`);
 				}
 			},
@@ -40,10 +43,16 @@ export const todoListsSlice = createAppSlice({
 				thunkAPI.dispatch(setAppStatusAC('loading'));
 				try {
 					const res = await todoListsApi.createTodoList(newTitle);
-					thunkAPI.dispatch(setAppStatusAC('succeeded'));
-					return { todoList: res.data.data.item };
-				} catch (error) {
-					return thunkAPI.rejectWithValue(`Failed to fetch todoLists - ${error}`);
+					if (res.data.resultCode === ResultCode.Success) {
+						thunkAPI.dispatch(setAppStatusAC('succeeded'));
+						return { todoList: res.data.data.item };
+					} else {
+						handleServerAppError(res.data, thunkAPI.dispatch);
+						return thunkAPI.rejectWithValue(`Add new todo error`);
+					}
+				} catch (error: unknown) {
+					handleServerNetworkError(error, thunkAPI.dispatch);
+					return thunkAPI.rejectWithValue(`Failed to add todoLists - ${error}`);
 				}
 			},
 			{
@@ -61,18 +70,22 @@ export const todoListsSlice = createAppSlice({
 			async (todolistId: string, thunkAPI) => {
 				thunkAPI.dispatch(setAppStatusAC('loading'));
 				try {
-					await todoListsApi.deleteTodoList(todolistId);
-					thunkAPI.dispatch(setAppStatusAC('succeeded'));
-					return { todolistId };
+					const res = await todoListsApi.deleteTodoList(todolistId);
+					if (res.data.resultCode === ResultCode.Success) {
+						thunkAPI.dispatch(setAppStatusAC('succeeded'));
+						return { todolistId };
+					} else {
+						handleServerAppError(res.data, thunkAPI.dispatch);
+						return thunkAPI.rejectWithValue(`remove todo error`);
+					}
 				} catch (error) {
-					return thunkAPI.rejectWithValue(`Failed to fetch todoLists - ${error}`);
+					handleServerNetworkError(error, thunkAPI.dispatch);
+					return thunkAPI.rejectWithValue(`Failed to remove todoList - ${error}`);
 				}
 			},
 			{
 				fulfilled: (state, action) => {
-					if (!action.payload?.todolistId) return;
-
-					return state.filter((tl) => tl.id !== action.payload?.todolistId);
+					return state.filter((tl) => tl.id !== action.payload.todolistId);
 				},
 			},
 		),
@@ -84,25 +97,20 @@ export const todoListsSlice = createAppSlice({
 
 					if (res.data.resultCode === ResultCode.Success) {
 						thunkAPI.dispatch(setAppStatusAC('succeeded'));
-						return payload;
+						return { todolistId: payload.todolistId, newTitle: payload.newTitle };
 					} else {
-						if (res.data.messages.length) {
-							thunkAPI.dispatch(setAppErrorAC(res.data.messages[0]));
-						} else {
-							thunkAPI.dispatch(setAppErrorAC('Some error occurred'));
-						}
-						thunkAPI.dispatch(setAppStatusAC('failed'));
+						handleServerAppError(res.data, thunkAPI.dispatch);
+						return thunkAPI.rejectWithValue(`Change todo title error`);
 					}
 				} catch (error) {
-					return thunkAPI.rejectWithValue(error);
+					handleServerNetworkError(error, thunkAPI.dispatch);
+					return thunkAPI.rejectWithValue(`Failed to change todoList title - ${error}`);
 				}
 			},
 			{
 				fulfilled: (state, action) => {
-					if (!action.payload?.todolistId) return;
-
 					return state.map((tl) =>
-						tl.id === action.payload?.todolistId ? { ...tl, title: action.payload.newTitle } : tl,
+						tl.id === action.payload.todolistId ? { ...tl, title: action.payload.newTitle } : tl,
 					);
 				},
 			},
