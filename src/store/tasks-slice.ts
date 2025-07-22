@@ -1,10 +1,9 @@
-import { TaskType, UpdateTaskModel } from '@features/TodoLists/api/types';
+import { DomainTaskSchema, TaskType, UpdateTaskModel } from '@features/TodoLists/api/types';
 import { createAppSlice } from '../utils/thunks/todo';
 import { setAppErrorAC, setAppStatusAC } from './app-slice';
 import { tasksApi } from '@features/TodoLists/api/tasks-api';
 import { AppRootState } from '@store/store';
 import { removeTodoListTC } from '@store/todo-slice';
-import axios from 'axios';
 import { handleServerAppError } from '../utils/serverResponse/handleServerAppError';
 import { ResultCode } from '@features/TodoLists/api/types/enums';
 import { handleServerNetworkError } from '../utils/serverResponse/handleServerNetworkError';
@@ -22,18 +21,12 @@ const tasksSlice = createAppSlice({
 				thunkAPI.dispatch(setAppStatusAC('loading'));
 				try {
 					const res = await tasksApi.getTasks(todolistId);
-
+					DomainTaskSchema.array().parse(res.data.items);
 					thunkAPI.dispatch(setAppStatusAC('succeeded'));
 					return { todolistId, tasks: res.data.items };
 				} catch (error) {
-					if (axios.isAxiosError(error)) {
-						// handleServerAppResponse(error, thunkAPI.dispatch, thunkAPI.rejectWithValue);
-						return thunkAPI.rejectWithValue(`fetch tasks error- ${error.message}`);
-					} else {
-						thunkAPI.dispatch(setAppErrorAC(`Unexpected error occurred ${error}`));
-						thunkAPI.dispatch(setAppStatusAC('failed'));
-						return thunkAPI.rejectWithValue(`Unexpected error occurred ${error}`);
-					}
+					handleServerNetworkError(error, thunkAPI.dispatch);
+					return thunkAPI.rejectWithValue(`fetch tasks error`);
 				}
 			},
 			{

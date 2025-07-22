@@ -16,6 +16,8 @@ export const Login = () => {
 	} = useForm<Inputs>({
 		resolver: zodResolver(loginSchema),
 		defaultValues: { email: '', password: '', rememberMe: false },
+		mode: 'onSubmit',
+		reValidateMode: 'onChange',
 	});
 
 	const onSubmit: SubmitHandler<Inputs> = (data) => {
@@ -28,7 +30,12 @@ export const Login = () => {
 			<div className={s.modal}>
 				<div className={s.modal__title}>Вход</div>
 				<form className={s.form} onSubmit={handleSubmit(onSubmit)}>
-					<input className={s.form__input} placeholder={'login'} type="text" {...register('email')} />
+					<input
+						className={s.form__input}
+						placeholder={'login'}
+						type="text"
+						{...register('email', { required: 'Email is required' })}
+					/>
 					{errors.email && <span className={s.form__error}>{errors.email?.message}</span>}
 					<input className={s.form__input} placeholder={'password'} type="text" {...register('password')} />
 					{errors.password && <span className={s.form__error}>{errors.password?.message}</span>}
