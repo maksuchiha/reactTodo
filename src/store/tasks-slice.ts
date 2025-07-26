@@ -1,12 +1,12 @@
 import { DomainTaskSchema, TaskType, UpdateTaskModel } from '@features/TodoLists/api/types';
-import { createAppSlice } from '../utils/thunks/todo';
+import { createAppSlice } from '@utils/thunks';
 import { setAppErrorAC, setAppStatusAC } from './app-slice';
 import { tasksApi } from '@features/TodoLists/api/tasks-api';
 import { AppRootState } from '@store/store';
 import { removeTodoListTC } from '@store/todo-slice';
-import { handleServerAppError } from '../utils/serverResponse/handleServerAppError';
+import { handleServerAppError } from '@utils/serverResponse/handleServerAppError';
 import { ResultCode } from '@features/TodoLists/api/types/enums';
-import { handleServerNetworkError } from '../utils/serverResponse/handleServerNetworkError';
+import { handleServerNetworkError } from '@utils/serverResponse/handleServerNetworkError';
 
 export type TasksStateType = {
 	[key: string]: TaskType[];

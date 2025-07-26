@@ -1,31 +1,28 @@
 import { Outlet } from 'react-router-dom';
 import { Header } from '@components/layouts/Header';
 import { Footer } from '@components/layouts/Footer';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { ErrorSnackbar } from './components/ui/ErrorSnackbar';
+import { ErrorSnackbar } from '@components/ui/ErrorSnackbar';
 import { AppDispatchType } from '@store/store';
-import { fetchTodoListsTC } from '@store/todo-slice';
+import { initializeAppTC } from '@features/auth/model/auth-slice';
+import { Preloader } from '@components/ui';
 
 export const App = () => {
+	const [isInitialized, setIsInitialized] = useState(false);
 	const dispatch = useDispatch<AppDispatchType>();
 	useEffect(() => {
-		dispatch(fetchTodoListsTC());
+		dispatch(initializeAppTC()).finally(() => {
+			setIsInitialized(true);
+		});
 	}, [dispatch]);
-	return (
+	return !isInitialized ? (
+		<Preloader />
+	) : (
 		<>
 			<Header />
 			<main>
 				<div className="container">
-					{/*<Routes>*/}
-					{/*	<Route path={'/'} element={<HomePage />} />*/}
-					{/*	<Route path={Paths.DOING} element={<Doing path={Paths.DOING} products={adidasArr} />} />*/}
-					{/*	<Route path={Paths.OFFERS} element={<Doing path={Paths.OFFERS} products={pumaArr} />} />*/}
-					{/*	<Route path={Paths.PRODUCT_PAGE} element={<ProductPage products={adidasArr} productId={'productId'} />} />*/}
-					{/*	<Route path={Paths.OFFERS_PAGE} element={<ProductPage products={pumaArr} productId={'productId'} />} />*/}
-					{/*	<Route path={Paths.ERROR404} element={<Error404 />} />*/}
-					{/*	<Route path={'/*'} element={<Navigate to={Paths.ERROR404} />} />*/}
-					{/*</Routes>*/}
 					<Outlet />
 				</div>
 			</main>

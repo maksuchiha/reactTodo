@@ -1,31 +1,41 @@
 import s from './Login.module.scss';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { loginSchema } from '@features/auth/lib/schemas';
-import { z } from 'zod';
-
-type Inputs = z.infer<typeof loginSchema>;
+import { LoginInputs, loginSchema } from '@features/auth/lib/schemas/loginSchema';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatchType, AppRootState } from '@store/store';
+import { loginTC } from '@features/auth/model/auth-slice';
+import { ErrorSnackbar } from '@components/ui/ErrorSnackbar';
+import React from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
 
 export const Login = () => {
+	const location = useLocation();
+	const from = location.state?.from?.pathname || '/';
+	const dispatch = useDispatch<AppDispatchType>();
+	const isAuth = useSelector<AppRootState, boolean>((state) => state.auth.isLoggedIn);
+
 	const {
 		register,
 		handleSubmit,
 		reset,
 		control,
 		formState: { errors },
-	} = useForm<Inputs>({
+	} = useForm<LoginInputs>({
 		resolver: zodResolver(loginSchema),
 		defaultValues: { email: '', password: '', rememberMe: false },
 		mode: 'onSubmit',
 		reValidateMode: 'onChange',
 	});
 
-	const onSubmit: SubmitHandler<Inputs> = (data) => {
-		console.log(data);
+	const onSubmit: SubmitHandler<LoginInputs> = async (data) => {
+		dispatch(loginTC(data));
 		reset();
 	};
 
-	return (
+	return isAuth ? (
+		<Navigate to={from} />
+	) : (
 		<div className={s.login}>
 			<div className={s.modal}>
 				<div className={s.modal__title}>Вход</div>
@@ -47,6 +57,7 @@ export const Login = () => {
 					<button className={s.form__button}>Войти</button>
 				</form>
 			</div>
+			<ErrorSnackbar />
 		</div>
 	);
 };

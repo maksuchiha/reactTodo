@@ -4,3 +4,4 @@ export { ProductCard } from './PrudoctCard';
 export { ProgressBar } from './ProgressBar';
 export { Snackbar } from './Snackbar';
 export { AddInput } from './AddInput';
+export { Preloader } from './Preloader';

@@ -1,10 +1,10 @@
 import { TodolistSchema, TodoListType } from '@features/TodoLists/api/types';
 import { RequestStatus, setAppStatusAC } from './app-slice';
 import { todoListsApi } from '@features/TodoLists/api/todolists-api';
-import { createAppSlice } from '../utils/thunks/todo';
+import { createAppSlice } from '@utils/thunks';
 import { ResultCode } from '@features/TodoLists/api/types/enums';
-import { handleServerAppError } from '../utils/serverResponse/handleServerAppError';
-import { handleServerNetworkError } from '../utils/serverResponse/handleServerNetworkError';
+import { handleServerAppError } from '@utils/serverResponse/handleServerAppError';
+import { handleServerNetworkError } from '@utils/serverResponse/handleServerNetworkError';
 
 export type TodoFilterType = 'all' | 'completed' | 'progress';
 export type TodolistStateType = TodoListType & {

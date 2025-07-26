@@ -1,11 +1,11 @@
-import { z } from 'zod/v4';
+import { z } from 'zod';
 import { TaskStatus, TaskPriority } from './enums';
 
 export const DomainTaskSchema = z.object({
 	description: z.string().nullable(),
 	title: z.string(),
-	status: z.enum(TaskStatus),
-	priority: z.enum(TaskPriority),
+	status: z.nativeEnum(TaskStatus),
+	priority: z.nativeEnum(TaskPriority),
 	startDate: z.coerce.date().nullable(),
 	deadline: z.coerce.date().nullable(),
 	id: z.string(),

@@ -1,5 +1,6 @@
 import { todoInstance } from '@instances/todo';
-import { ResponseType, TaskType, UpdateTaskModel } from './types';
+import { TaskType, UpdateTaskModel } from './types';
+import { BaseResponse } from '@globalTypes/response.types';
 
 type GetTasksResponseType = {
 	items: TaskType[];
@@ -9,15 +10,15 @@ type GetTasksResponseType = {
 
 export const tasksApi = {
 	createTask(todolistId: string, title: string) {
-		return todoInstance.post<ResponseType<{ item: TaskType }>>(`todo-lists/${todolistId}/tasks`, { title });
+		return todoInstance.post<BaseResponse<{ item: TaskType }>>(`todo-lists/${todolistId}/tasks`, { title });
 	},
 	getTasks(todolistId: string) {
 		return todoInstance.get<GetTasksResponseType>(`todo-lists/${todolistId}/tasks`);
 	},
 	deleteTask(todolistId: string, taskId: string) {
-		return todoInstance.delete<ResponseType>(`todo-lists/${todolistId}/tasks/${taskId}`);
+		return todoInstance.delete<BaseResponse>(`todo-lists/${todolistId}/tasks/${taskId}`);
 	},
 	updateTask(todolistId: string, taskId: string, task: UpdateTaskModel) {
-		return todoInstance.put<ResponseType>(`todo-lists/${todolistId}/tasks/${taskId}`, task);
+		return todoInstance.put<BaseResponse>(`todo-lists/${todolistId}/tasks/${taskId}`, task);
 	},
 };

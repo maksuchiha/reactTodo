@@ -8,7 +8,9 @@
 			"@components/*": ["components/*"],
 			"@pages/*": ["pages/*"],
 			"@store/*": ["store/*"],
-			"@instances/*": ["utils/axios/instances/*"]
+			"@instances/*": ["utils/axios/instances/*"],
+			"@globalTypes/*": ["types/*"],
+			"@utils/*": ["utils/*"],
 		},
 		"target": "es5",
 		"lib": ["dom", "dom.iterable", "esnext"],

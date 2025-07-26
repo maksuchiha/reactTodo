@@ -18,8 +18,8 @@ beforeEach(() => {
 	todolistId2 = v1();
 
 	startState = [
-		{ id: todolistId1, title: 'What to learn', order: 0, addedDate: '', filter: 'all', entityStatus: 'idle' },
-		{ id: todolistId2, title: 'What to buy', order: 0, addedDate: '', filter: 'all', entityStatus: 'idle' },
+		{ id: todolistId1, title: 'What to learn', order: 0, addedDate: new Date(), filter: 'all', entityStatus: 'idle' },
+		{ id: todolistId2, title: 'What to buy', order: 0, addedDate: new Date(), filter: 'all', entityStatus: 'idle' },
 	];
 });
 
@@ -36,7 +36,7 @@ test('correct todolist should be added', () => {
 		id: todolistId1,
 		title: newTodoTitle,
 		order: 0,
-		addedDate: '',
+		addedDate: new Date(),
 		filter: 'all',
 		entityStatus: 'idle',
 	};
