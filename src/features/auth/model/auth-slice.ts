@@ -5,6 +5,7 @@ import { handleServerNetworkError } from '@utils/serverResponse/handleServerNetw
 import { setAppStatusAC } from '@store/app-slice';
 import { ResultCode } from '@features/TodoLists/api/types/enums';
 import { handleServerAppError } from '@utils/serverResponse/handleServerAppError';
+import { AUTH_TOKEN } from '../../../constants';
 
 export const authSlice = createAppSlice({
 	name: 'auth',
@@ -45,7 +46,7 @@ export const authSlice = createAppSlice({
 					// 27367
 					if (res.data.resultCode === ResultCode.Success) {
 						dispatch(setAppStatusAC('succeeded'));
-						console.log(res.data);
+						localStorage.setItem(AUTH_TOKEN, res.data.data.token);
 						return { isLoggedIn: true };
 					} else {
 						handleServerAppError(res.data, dispatch);
@@ -53,7 +54,32 @@ export const authSlice = createAppSlice({
 					}
 				} catch (error) {
 					handleServerNetworkError(error, dispatch);
-					return rejectWithValue(`fetch tasks error`);
+					return rejectWithValue(`login error`);
+				}
+			},
+			{
+				fulfilled: (state, action) => {
+					state.isLoggedIn = action.payload.isLoggedIn;
+				},
+			},
+		),
+		logOutTC: create.asyncThunk(
+			async (_, { dispatch, rejectWithValue }) => {
+				// логика санки для авторизации
+				dispatch(setAppStatusAC('loading'));
+				try {
+					const res = await authApi.logOut();
+					if (res.data.resultCode === ResultCode.Success) {
+						dispatch(setAppStatusAC('succeeded'));
+						localStorage.removeItem(AUTH_TOKEN);
+						return { isLoggedIn: false };
+					} else {
+						handleServerAppError(res.data, dispatch);
+						return rejectWithValue(`logout error`);
+					}
+				} catch (error) {
+					handleServerNetworkError(error, dispatch);
+					return rejectWithValue(`logout error`);
 				}
 			},
 			{
@@ -69,5 +95,5 @@ export const authSlice = createAppSlice({
 });
 
 export const { selectIsLoggedIn } = authSlice.selectors;
-export const { loginTC, initializeAppTC } = authSlice.actions;
+export const { loginTC, initializeAppTC, logOutTC } = authSlice.actions;
 export const authReducer = authSlice.reducer;

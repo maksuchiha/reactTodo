@@ -7,6 +7,7 @@ import { removeTodoListTC } from '@store/todo-slice';
 import { handleServerAppError } from '@utils/serverResponse/handleServerAppError';
 import { ResultCode } from '@features/TodoLists/api/types/enums';
 import { handleServerNetworkError } from '@utils/serverResponse/handleServerNetworkError';
+import { logOutTC } from '@features/auth/model/auth-slice';
 
 export type TasksStateType = {
 	[key: string]: TaskType[];
@@ -137,6 +138,9 @@ const tasksSlice = createAppSlice({
 		builder.addCase(removeTodoListTC.fulfilled, (state, action) => {
 			if (!action.payload?.todolistId) return;
 			delete state[action.payload.todolistId];
+		});
+		builder.addCase(logOutTC.fulfilled, () => {
+			return {};
 		});
 	},
 });

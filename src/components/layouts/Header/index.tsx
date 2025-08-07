@@ -3,6 +3,10 @@ import Logo from '@/assets/icons/logo.svg';
 import { Button, ProgressBar } from '@components/ui';
 import { NavLink } from 'react-router-dom';
 import { Paths } from '../../../paths';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatchType, AppRootState } from '@store/store';
+import { useNavigate } from 'react-router-dom';
+import { logOutTC } from '@features/auth/model/auth-slice';
 
 type ActiveClassType = {
 	isActive: boolean;
@@ -10,8 +14,20 @@ type ActiveClassType = {
 };
 
 export const Header = () => {
+	const navigate = useNavigate();
+	const dispatch = useDispatch<AppDispatchType>();
+	const isAuth = useSelector<AppRootState, boolean>((state) => state.auth.isLoggedIn);
+
 	const navLinkClassName = ({ isActive }: ActiveClassType) =>
 		isActive ? `${s.nav__link} ${s.nav__link_active}` : s.nav__link;
+
+	const routeToLogin = () => {
+		navigate(Paths.LOGIN);
+	};
+
+	const logout = () => {
+		dispatch(logOutTC());
+	};
 
 	return (
 		<header className={s.header}>
@@ -42,7 +58,7 @@ export const Header = () => {
 									</NavLink>
 								</li>
 								<li className="header-nav__item">
-									<NavLink to="/blog" className={navLinkClassName}>
+									<NavLink to={Paths.FAQ} className={navLinkClassName}>
 										Блог
 									</NavLink>
 								</li>
@@ -59,7 +75,12 @@ export const Header = () => {
 							</ul>
 						</nav>
 					</div>
-					<Button onClick={() => {}} title={'Обратная связь'} iconName={'phone'} className={s.feedback} />
+					{/*<Button onClick={() => {}} title={'Обратная связь'} iconName={'phone'} className={s.feedback} />*/}
+					{isAuth ? (
+						<Button onClick={logout} title={'Выйти'} className={s.feedback} />
+					) : (
+						<Button onClick={routeToLogin} title={'Войти'} className={s.feedback} />
+					)}
 
 					<button className={s.burger} aria-label="Мобильное меню">
 						<span></span>

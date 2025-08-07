@@ -1,11 +1,20 @@
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { Paths } from '../paths';
 import { useSelector } from 'react-redux';
 import { AppRootState } from '@store/store';
 
-export const ProtectedRouter: FC = () => {
+type ProtectedRouterPropsType = {
+	element?: ReactNode;
+	redirectPath?: string;
+};
+
+export const ProtectedRouter: FC<ProtectedRouterPropsType> = ({ element, redirectPath }) => {
 	const location = useLocation();
 	const isAuth = useSelector<AppRootState, boolean>((state) => state.auth.isLoggedIn);
-	return isAuth ? <Outlet /> : <Navigate to={Paths.LOGIN} state={{ from: location }} replace />;
+
+	if (!isAuth) {
+		return <Navigate to={Paths.LOGIN} state={{ from: redirectPath ? redirectPath : location }} replace />;
+	}
+	return element ? element : <Outlet />;
 };

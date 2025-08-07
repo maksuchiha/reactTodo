@@ -7,6 +7,9 @@ export const authApi = {
 		return todoInstance.get<BaseResponse<{ id: number; email: string; login: string }>>('auth/me');
 	},
 	login(payload: LoginInputs) {
-		return todoInstance.post<BaseResponse<{ userId: number }>>('auth/login', payload);
+		return todoInstance.post<BaseResponse<{ userId: number; token: string }>>('auth/login', payload);
+	},
+	logOut() {
+		return todoInstance.delete<BaseResponse>('auth/login');
 	},
 };

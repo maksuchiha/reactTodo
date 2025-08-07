@@ -5,6 +5,7 @@ import { createAppSlice } from '@utils/thunks';
 import { ResultCode } from '@features/TodoLists/api/types/enums';
 import { handleServerAppError } from '@utils/serverResponse/handleServerAppError';
 import { handleServerNetworkError } from '@utils/serverResponse/handleServerNetworkError';
+import { logOutTC } from '@features/auth/model/auth-slice';
 
 export type TodoFilterType = 'all' | 'completed' | 'progress';
 export type TodolistStateType = TodoListType & {
@@ -129,14 +130,13 @@ export const todoListsSlice = createAppSlice({
 			},
 		),
 	}),
+	extraReducers: (builder) => {
+		builder.addCase(logOutTC.fulfilled, () => {
+			return [];
+		});
+	},
 });
 
-export const {
-	fetchTodoListsTC,
-	addNewTodoListTC,
-	changeTodoListTitleTC,
-	changeTodolistEntityStatusAC,
-	changeTodoListFilterAC,
-	removeTodoListTC,
-} = todoListsSlice.actions;
+export const { fetchTodoListsTC, addNewTodoListTC, changeTodoListTitleTC, changeTodoListFilterAC, removeTodoListTC } =
+	todoListsSlice.actions;
 export const todoListsReducer = todoListsSlice.reducer;

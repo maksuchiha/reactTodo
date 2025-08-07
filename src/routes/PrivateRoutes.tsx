@@ -1,10 +1,16 @@
 import { Paths } from '../paths';
-import { ProtectPage } from '@pages/ProtectPage';
 import { RouteObject } from 'react-router-dom';
+import { TodoLists } from '@features/TodoLists';
+import { Faq } from '@pages/Faq';
+import { ProtectedRouter } from './ProtectedRouter';
 
 export const PrivateRoutes: RouteObject[] = [
 	{
 		path: `/${Paths.PROTECT_PAGE}`,
-		element: <ProtectPage />,
+		element: <ProtectedRouter element={<TodoLists />} />,
+	},
+	{
+		path: `/${Paths.FAQ}`,
+		element: <ProtectedRouter element={<Faq />} />,
 	},
 ];

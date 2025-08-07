@@ -10,4 +10,5 @@ export const Paths = {
 	PROTECT_PAGE: '/protect',
 	LOGIN: '/login',
 	ERROR404: '/error404',
+	FAQ: '/faq',
 } as const;
