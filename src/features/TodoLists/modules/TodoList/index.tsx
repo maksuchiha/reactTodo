@@ -1,69 +1,44 @@
 import s from './todolist.module.scss';
-import { FC, memo, useCallback, useEffect } from 'react';
+import { FC, memo, useCallback } from 'react';
 import { AddInput } from '@components/ui/AddInput';
 import { EditSpan } from '../EditSpan';
 import { Task } from '../Task';
-import { AppRootState, AppDispatchType } from '@store/store';
-import { createSelector } from 'reselect';
+import { AppDispatchType, AppRootState } from '@store/store';
 import { useDispatch, useSelector } from 'react-redux';
-import { TaskType } from '../../api/types';
-import { AppReducerType } from '@store/app-slice';
-import { TaskStatus } from '../../api/types/enums';
+import { AppReducerType, RequestStatus } from '@store/app-slice';
 import { TodoFilterType } from '@features/TodoLists';
-import { fetchTasksTC } from '@store/tasks-slice';
-import { TasksStateType } from '@store/tasks-slice';
+import { useCreateTaskMutation, useGetTasksQuery } from '@features/TodoLists/api/tasks-api';
+import { TaskType } from '@features/TodoLists/api/types';
+import { TaskStatus } from '@features/TodoLists/api/types/enums';
+import { todoListsApi, useDeleteTodoListMutation } from '@features/TodoLists/api/todolists-api';
 
 type TodoListPropsType = {
 	todoListId: string;
 	title: string;
 	filter: TodoFilterType;
 	changeFilterValue: (todoListId: string, filterValue: TodoFilterType) => void;
-	removeTask: (todoListId: string, taskId: string) => void;
-	addNewTask: (todoListId: string, newTaskName: string) => void;
-	removeTodoList: (todoListId: string) => void;
-	changeTaskTitle: (todoListId: string, taskId: string, newTitle: string) => void;
 	changeTodoListTitle: (todoListId: string, newTitle: string) => void;
-	updateTaskStatus: (todoListId: string, taskId: string, newStatus: boolean) => void;
+	disabled?: boolean;
 };
 
 export const TodoList: FC<TodoListPropsType> = memo(
-	({
-		todoListId,
-		title,
-		filter,
-		changeFilterValue,
-		removeTask,
-		addNewTask,
-		removeTodoList,
-		changeTaskTitle,
-		changeTodoListTitle,
-		updateTaskStatus,
-	}) => {
-		const getTasksState = (state: AppRootState): TasksStateType => state.todoTasks;
-
-		const selectTasksForTodoList = createSelector(
-			[getTasksState, (_: AppRootState, todoListId: string) => todoListId],
-			(tasks, todoListId) => tasks[todoListId] || [],
-		);
-
-		const tasksForTodoList = useSelector((state: AppRootState) => selectTasksForTodoList(state, todoListId));
+	({ todoListId, title, filter, changeFilterValue, changeTodoListTitle, disabled }) => {
+		const { data: tasks } = useGetTasksQuery(todoListId);
 		const entityStatus = useSelector<AppRootState, AppReducerType>((state) => state.ui);
-
+		const [createTask] = useCreateTaskMutation();
+		const [deleteTodoList] = useDeleteTodoListMutation();
 		const dispatch = useDispatch<AppDispatchType>();
 
-		useEffect(() => {
-			dispatch(fetchTasksTC(todoListId));
-		}, [todoListId, dispatch]);
-
+		const tasksForTodoList = tasks?.items ?? [];
 		let filteredTasks: TaskType[];
 
 		switch (filter) {
 			case 'completed': {
-				filteredTasks = tasksForTodoList.filter((t) => t.status === TaskStatus.Completed);
+				filteredTasks = tasksForTodoList?.filter((t) => t.status === TaskStatus.Completed);
 				break;
 			}
 			case 'progress': {
-				filteredTasks = tasksForTodoList.filter((t) => t.status === TaskStatus.New);
+				filteredTasks = tasksForTodoList?.filter((t) => t.status === TaskStatus.New);
 				break;
 			}
 			default: {
@@ -71,18 +46,18 @@ export const TodoList: FC<TodoListPropsType> = memo(
 			}
 		}
 
-		const updateTaskStatusHandler = useCallback(
-			(taskId: string, newStatus: boolean) => {
-				updateTaskStatus(todoListId, taskId, newStatus);
+		const changeTodolistStatus = useCallback(
+			(entityStatus: RequestStatus) => {
+				dispatch(
+					todoListsApi.util.updateQueryData('getTodoLists', undefined, (state) => {
+						const todolist = state.find((t) => t.id === todoListId);
+						if (todolist) {
+							todolist.entityStatus = entityStatus;
+						}
+					}),
+				);
 			},
-			[todoListId, updateTaskStatus],
-		);
-
-		const removeTaskHandler = useCallback(
-			(taskId: string) => {
-				removeTask(todoListId, taskId);
-			},
-			[todoListId, removeTask],
+			[dispatch, todoListId], // keep this list minimal but correct
 		);
 
 		const getFilterStatus = useCallback(
@@ -101,21 +76,19 @@ export const TodoList: FC<TodoListPropsType> = memo(
 
 		const addNewTaskHandler = useCallback(
 			(newTaskName: string) => {
-				addNewTask(todoListId, newTaskName);
+				createTask({ todolistId: todoListId, title: newTaskName });
 			},
-			[todoListId, addNewTask],
+			[todoListId, createTask],
 		);
 
 		const removeTodoListHandler = useCallback(() => {
-			removeTodoList(todoListId);
-		}, [todoListId, removeTodoList]);
-
-		const changeTaskTitleHandler = useCallback(
-			(taskId: string, newTitle: string) => {
-				changeTaskTitle(todoListId, taskId, newTitle);
-			},
-			[todoListId, changeTaskTitle],
-		);
+			changeTodolistStatus('loading');
+			deleteTodoList(todoListId)
+				.unwrap()
+				.catch(() => {
+					changeTodolistStatus('idle');
+				});
+		}, [todoListId, deleteTodoList, changeTodolistStatus]);
 
 		const changeTodoListTitleHandler = useCallback(
 			(newTitle: string) => {
@@ -127,18 +100,7 @@ export const TodoList: FC<TodoListPropsType> = memo(
 		const getTasks =
 			filteredTasks.length > 0 ? (
 				filteredTasks.map((t) => {
-					return (
-						<Task
-							key={t.id}
-							taskId={t.id}
-							title={t.title}
-							completed={t.status === TaskStatus.Completed}
-							updateTaskStatus={updateTaskStatusHandler}
-							changeTaskTitle={changeTaskTitleHandler}
-							removeTask={removeTaskHandler}
-							disabled={entityStatus.status === 'loading'}
-						/>
-					);
+					return <Task key={t.id} todoListId={todoListId} task={t} disabled={entityStatus.status === 'loading'} />;
 				})
 			) : (
 				<p>тасок нет</p>
@@ -147,12 +109,8 @@ export const TodoList: FC<TodoListPropsType> = memo(
 		return (
 			<div className={s.todolist}>
 				<div className={s.todolist__title}>
-					<EditSpan
-						title={title}
-						changeTitle={changeTodoListTitleHandler}
-						disabled={entityStatus.status === 'loading'}
-					/>
-					<button onClick={removeTodoListHandler} disabled={entityStatus.status === 'loading'}>
+					<EditSpan title={title} changeTitle={changeTodoListTitleHandler} disabled={disabled} />
+					<button onClick={removeTodoListHandler} disabled={disabled}>
 						x
 					</button>
 				</div>
@@ -160,7 +118,7 @@ export const TodoList: FC<TodoListPropsType> = memo(
 					className={s.addNewTask}
 					addItem={addNewTaskHandler}
 					placeholder={'Добавить задачу'}
-					disabled={entityStatus.status === 'loading'}
+					disabled={disabled}
 				/>
 				<ul className={s.tasks}>{getTasks}</ul>
 				<div className={s.filter}>

@@ -4,16 +4,20 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { LoginInputs, loginSchema } from '@features/auth/lib/schemas/loginSchema';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatchType, AppRootState } from '@store/store';
-import { loginTC } from '@features/auth/model/auth-slice';
 import { ErrorSnackbar } from '@components/ui/ErrorSnackbar';
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { useLoginMutation } from '@features/auth/api/authApi';
+import { ResultCode } from '@features/TodoLists/api/types/enums';
+import { setIsLoggedInAC } from '@store/app-slice';
+import { AUTH_TOKEN } from '@utils/constants';
 
 export const Login = () => {
 	const location = useLocation();
 	const from = location.state?.from?.pathname || '/';
 	const dispatch = useDispatch<AppDispatchType>();
-	const isAuth = useSelector<AppRootState, boolean>((state) => state.auth.isLoggedIn);
+	const [login] = useLoginMutation();
+	const isAuth = useSelector<AppRootState, boolean>((state) => state.ui.isLoggedIn);
 
 	const {
 		register,
@@ -29,7 +33,14 @@ export const Login = () => {
 	});
 
 	const onSubmit: SubmitHandler<LoginInputs> = async (data) => {
-		dispatch(loginTC(data));
+		// dispatch(loginTC(data));
+		login(data).then((res) => {
+			if (res.data?.resultCode === ResultCode.Success) {
+				dispatch(setIsLoggedInAC({ isLoggedIn: true }));
+				localStorage.setItem(AUTH_TOKEN, res.data.data.token);
+				reset();
+			}
+		});
 		reset();
 	};
 

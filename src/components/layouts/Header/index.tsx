@@ -6,7 +6,11 @@ import { Paths } from '../../../paths';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatchType, AppRootState } from '@store/store';
 import { useNavigate } from 'react-router-dom';
-import { logOutTC } from '@features/auth/model/auth-slice';
+import { useLogOutMutation } from '@features/auth/api/authApi';
+import { ResultCode } from '@features/TodoLists/api/types/enums';
+import { setIsLoggedInAC } from '@store/app-slice';
+import { AUTH_TOKEN } from '@utils/constants';
+import { todoInstance } from '@instances/todo';
 
 type ActiveClassType = {
 	isActive: boolean;
@@ -16,7 +20,8 @@ type ActiveClassType = {
 export const Header = () => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch<AppDispatchType>();
-	const isAuth = useSelector<AppRootState, boolean>((state) => state.auth.isLoggedIn);
+	const [logOut] = useLogOutMutation();
+	const isAuth = useSelector<AppRootState, boolean>((state) => state.ui.isLoggedIn);
 
 	const navLinkClassName = ({ isActive }: ActiveClassType) =>
 		isActive ? `${s.nav__link} ${s.nav__link_active}` : s.nav__link;
@@ -26,7 +31,18 @@ export const Header = () => {
 	};
 
 	const logout = () => {
-		dispatch(logOutTC());
+		logOut()
+			.then((res) => {
+				if (res.data?.resultCode === ResultCode.Success) {
+					dispatch(setIsLoggedInAC({ isLoggedIn: false }));
+					localStorage.removeItem(AUTH_TOKEN);
+					// dispatch(todoInstance.util.resetApiState());
+					// dispatch(clearTodoListsDataAC());
+				}
+			})
+			.then(() => {
+				dispatch(todoInstance.util.invalidateTags(['TodoList', 'Task']));
+			});
 	};
 
 	return (

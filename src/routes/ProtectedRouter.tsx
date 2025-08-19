@@ -11,7 +11,7 @@ type ProtectedRouterPropsType = {
 
 export const ProtectedRouter: FC<ProtectedRouterPropsType> = ({ element, redirectPath }) => {
 	const location = useLocation();
-	const isAuth = useSelector<AppRootState, boolean>((state) => state.auth.isLoggedIn);
+	const isAuth = useSelector<AppRootState, boolean>((state) => state.ui.isLoggedIn);
 
 	if (!isAuth) {
 		return <Navigate to={Paths.LOGIN} state={{ from: redirectPath ? redirectPath : location }} replace />;

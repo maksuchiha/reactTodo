@@ -8,17 +8,48 @@ type GetTasksResponseType = {
 	error: string | null;
 };
 
-export const tasksApi = {
-	createTask(todolistId: string, title: string) {
-		return todoInstance.post<BaseResponse<{ item: TaskType }>>(`todo-lists/${todolistId}/tasks`, { title });
-	},
-	getTasks(todolistId: string) {
-		return todoInstance.get<GetTasksResponseType>(`todo-lists/${todolistId}/tasks`);
-	},
-	deleteTask(todolistId: string, taskId: string) {
-		return todoInstance.delete<BaseResponse>(`todo-lists/${todolistId}/tasks/${taskId}`);
-	},
-	updateTask(todolistId: string, taskId: string, task: UpdateTaskModel) {
-		return todoInstance.put<BaseResponse>(`todo-lists/${todolistId}/tasks/${taskId}`, task);
-	},
-};
+export const tasksApi = todoInstance.injectEndpoints({
+	endpoints: (build) => ({
+		getTasks: build.query<GetTasksResponseType, string>({
+			query: (todolistId) => ({
+				url: `todo-lists/${todolistId}/tasks`,
+				method: 'GET',
+			}),
+			// Кэш задач метим тегом "Task" для всего списка и (опционально) для каждой задачи
+			providesTags: (result, error, todolistId) => [
+				{ type: 'Task' as const, id: todolistId },
+				...(result?.items ?? []).map((t) => ({ type: 'Task' as const, id: t.id })),
+			],
+		}),
+		createTask: build.mutation<BaseResponse<{ item: TaskType }>, { todolistId: string; title: string }>({
+			query: ({ todolistId, title }) => ({
+				url: `todo-lists/${todolistId}/tasks`,
+				method: 'POST',
+				body: { title },
+			}),
+			invalidatesTags: ['Task'],
+		}),
+		updateTask: build.mutation<BaseResponse, { todoListId: string; taskId: string; task: UpdateTaskModel }>({
+			query: ({ todoListId, taskId, task }) => ({
+				url: `todo-lists/${todoListId}/tasks/${taskId}`,
+				method: 'PUT',
+				body: task,
+			}),
+			invalidatesTags: ['Task'],
+		}),
+		deleteTask: build.mutation<BaseResponse, { todoListId: string; taskId: string }>({
+			query: ({ todoListId, taskId }) => ({
+				url: `todo-lists/${todoListId}/tasks/${taskId}`,
+				method: 'DELETE',
+			}),
+			// Инвалидируем конкретную задачу и список задач этого тудулиста
+			invalidatesTags: (result, error, { todoListId, taskId }) => [
+				{ type: 'Task', id: taskId },
+				{ type: 'Task', id: todoListId },
+			],
+		}),
+	}),
+	overrideExisting: false,
+});
+
+export const { useGetTasksQuery, useCreateTaskMutation, useUpdateTaskMutation, useDeleteTaskMutation } = tasksApi;

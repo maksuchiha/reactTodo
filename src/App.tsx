@@ -5,17 +5,22 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { ErrorSnackbar } from '@components/ui/ErrorSnackbar';
 import { AppDispatchType } from '@store/store';
-import { initializeAppTC } from '@features/auth/model/auth-slice';
 import { Preloader } from '@components/ui';
+import { useMeQuery } from '@features/auth/api/authApi';
+import { ResultCode } from '@features/TodoLists/api/types/enums';
+import { setIsLoggedInAC } from '@store/app-slice';
 
 export const App = () => {
 	const [isInitialized, setIsInitialized] = useState(false);
 	const dispatch = useDispatch<AppDispatchType>();
+	const { data, isLoading } = useMeQuery();
 	useEffect(() => {
-		dispatch(initializeAppTC()).finally(() => {
-			setIsInitialized(true);
-		});
-	}, [dispatch]);
+		if (isLoading) return;
+		setIsInitialized(true);
+		if (data?.resultCode === ResultCode.Success) {
+			dispatch(setIsLoggedInAC({ isLoggedIn: true }));
+		}
+	}, [isLoading, data?.resultCode, dispatch]);
 	return !isInitialized ? (
 		<Preloader />
 	) : (

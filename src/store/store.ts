@@ -1,15 +1,12 @@
 import { combineReducers } from 'redux';
 import { configureStore } from '@reduxjs/toolkit';
-import { appReducer } from './app-slice';
-import { todoListsReducer } from './todo-slice';
-import { tasksReducer } from './tasks-slice';
-import { authReducer } from '@features/auth/model/auth-slice';
+import { appSlice } from './app-slice';
+import { todoListsApi } from '@features/TodoLists/api/todolists-api';
+import { todoInstance } from '@instances/todo';
 
 const rootReducer = combineReducers({
-	todoLists: todoListsReducer,
-	todoTasks: tasksReducer,
-	auth: authReducer,
-	ui: appReducer,
+	[appSlice.name]: appSlice.reducer,
+	[todoInstance.reducerPath]: todoInstance.reducer,
 });
 
 export type AppRootState = ReturnType<typeof rootReducer>;
@@ -17,4 +14,5 @@ export type AppDispatchType = typeof store.dispatch;
 
 export const store = configureStore({
 	reducer: rootReducer,
+	middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(todoListsApi.middleware),
 });

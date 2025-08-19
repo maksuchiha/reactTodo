@@ -1,94 +1,61 @@
 import { TodoList } from './modules';
-import { FC, useCallback, useEffect } from 'react';
+import { FC, useCallback } from 'react';
 import s from './todolists.module.scss';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppRootState, AppDispatchType } from '@store/store';
+import { useDispatch } from 'react-redux';
+import { AppDispatchType } from '@store/store';
 import { AddInput } from '@components/ui/AddInput';
-import { TaskStatus } from './api/types/enums';
-import {
-	addNewTodoListTC,
-	changeTodoListFilterAC,
-	changeTodoListTitleTC,
-	fetchTodoListsTC,
-	removeTodoListTC,
-} from '@store/todo-slice';
-import { TodoListType } from './api/types';
-import { RequestStatus } from '@store/app-slice';
-import { addNewTaskTC, removeTaskTC, updateTaskTC } from '@store/tasks-slice';
 
+import {
+	todoListsApi,
+	useCreateTodoListMutation,
+	useGetTodoListsQuery,
+	useUpdateTodoListTitleMutation,
+} from '@features/TodoLists/api/todolists-api';
 export type TodoFilterType = 'all' | 'completed' | 'progress';
-export type TodolistStateType = TodoListType & {
-	filter: TodoFilterType;
-	entityStatus: RequestStatus;
-};
 
 export const TodoLists: FC = () => {
-	const todoLists = useSelector<AppRootState, TodolistStateType[]>((state) => state.todoLists);
-	const dispatch = useDispatch<AppDispatchType>();
+	const { data: todoLists, isLoading } = useGetTodoListsQuery();
+	const [createTodoList] = useCreateTodoListMutation();
+	const [updateTodoListTitle] = useUpdateTodoListTitleMutation();
 
-	useEffect(() => {
-		dispatch(fetchTodoListsTC());
-	}, [dispatch]);
+	const dispatch = useDispatch<AppDispatchType>();
 
 	const changeFilterValue = useCallback(
 		(todoListId: string, filterValue: TodoFilterType) => {
-			dispatch(changeTodoListFilterAC({ todoListId, filterValue }));
-		},
-		[dispatch],
-	);
-
-	const updateTaskStatus = useCallback(
-		(todoListId: string, taskId: string, newStatus: boolean) => {
-			const getStatusNumber = newStatus ? TaskStatus.Completed : TaskStatus.New;
-
-			dispatch(updateTaskTC({ todolistId: todoListId, taskId, domainModel: { status: getStatusNumber } }));
-		},
-		[dispatch],
-	);
-
-	const removeTask = useCallback(
-		(todoListId: string, taskId: string) => {
-			dispatch(removeTaskTC({ todolistId: todoListId, taskId }));
-		},
-		[dispatch],
-	);
-
-	const addNewTask = useCallback(
-		(todoListId: string, newTaskName: string) => {
-			dispatch(addNewTaskTC({ todolistId: todoListId, title: newTaskName }));
+			dispatch(
+				todoListsApi.util.updateQueryData(
+					// название эндпоинта, в котором нужно обновить кэш
+					'getTodoLists',
+					// аргументы для эндпоинта
+					undefined,
+					// `updateRecipe` - коллбэк для обновления закэшированного стейта мутабельным образом
+					(state) => {
+						const todolist = state.find((todolist) => todolist.id === todoListId);
+						if (todolist) {
+							todolist.filter = filterValue;
+						}
+					},
+				),
+			);
 		},
 		[dispatch],
 	);
 
 	const addNewTodoList = useCallback(
 		(title: string) => {
-			dispatch(addNewTodoListTC(title));
+			createTodoList(title);
 		},
-		[dispatch],
-	);
-
-	const removeTodoList = useCallback(
-		(todoListId: string) => {
-			dispatch(removeTodoListTC(todoListId));
-		},
-		[dispatch],
-	);
-
-	const changeTaskTitle = useCallback(
-		(todoListId: string, taskId: string, newTitle: string) => {
-			dispatch(updateTaskTC({ todolistId: todoListId, taskId, domainModel: { title: newTitle } }));
-		},
-		[dispatch],
+		[createTodoList],
 	);
 
 	const changeTodoListTitle = useCallback(
 		(todolistId: string, newTitle: string) => {
-			dispatch(changeTodoListTitleTC({ todolistId, newTitle }));
+			updateTodoListTitle({ id: todolistId, title: newTitle });
 		},
-		[dispatch],
+		[updateTodoListTitle],
 	);
 
-	const getTodoLists = todoLists.map((tl) => {
+	const getTodoLists = todoLists?.map((tl) => {
 		return (
 			<TodoList
 				key={tl.id}
@@ -96,22 +63,22 @@ export const TodoLists: FC = () => {
 				title={tl.title}
 				filter={tl.filter}
 				changeFilterValue={changeFilterValue}
-				removeTask={removeTask}
-				addNewTask={addNewTask}
-				removeTodoList={removeTodoList}
-				changeTaskTitle={changeTaskTitle}
 				changeTodoListTitle={changeTodoListTitle}
-				updateTaskStatus={updateTaskStatus}
+				disabled={tl.entityStatus === 'loading'}
 			/>
 		);
 	});
+
+	const getSkeletons = Array(3)
+		.fill(null)
+		.map((_, index) => <div key={index}>skeleton</div>);
 
 	return (
 		<div className={s.todoLists}>
 			<div className={s.todoLists__top}>
 				<AddInput className={s.addNewTask} addItem={addNewTodoList} placeholder={'Добавить список'} />
 			</div>
-			<div className={s.todoLists__items}>{getTodoLists}</div>
+			<div className={s.todoLists__items}>{isLoading ? getSkeletons : getTodoLists}</div>
 		</div>
 	);
 };
